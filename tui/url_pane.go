@@ -31,5 +31,5 @@ func (m UrlPaneModel) View() string {
 		BorderStyle(lipgloss.RoundedBorder()).
 		Width(m.width).
 		Height(m.height)
-	return style.Render("URL pane")
+	return style.Render()
 }

@@ -27,9 +27,14 @@ func (m RequestPaneModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m RequestPaneModel) View() string {
+	border := generateBorder(
+		lipgloss.RoundedBorder(),
+		GenerateBorderOption{Title: "Request"},
+		m.width,
+	)
 	style := lipgloss.NewStyle().
-		BorderStyle(lipgloss.RoundedBorder()).
+		BorderStyle(border).
 		Width(m.width).
 		Height(m.height)
-	return style.Render("Request pane")
+	return style.Render()
 }
