@@ -1,9 +1,8 @@
 package panes
 
 import (
-	"strings"
-
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/x/ansi"
 )
 
 var methodColors = map[string]string{
@@ -37,8 +36,7 @@ func getMethodShort(method string) string {
 	if short, ok := methodShort[method]; ok {
 		return short
 	}
-	short := method[:min(3, len(method))]
-	return short + strings.Repeat(" ", 5-len(short))
+	return ansi.Truncate(method, 5, " ")
 }
 
 func RenderMethod(method string) string {

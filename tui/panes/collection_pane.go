@@ -53,7 +53,8 @@ func (m CollectionPaneModel) View() string {
 	var text string
 	for _, request := range m.requests {
 		method := RenderMethod(request.Method)
-		text += fmt.Sprintf("%s %s\n", method, request.URL)
+		u := RenderURL(request.URL, m.width-7)
+		text += fmt.Sprintf("%s %s\n", method, u)
 	}
 	return m.generateStyle().Render(text)
 }
