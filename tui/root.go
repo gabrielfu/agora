@@ -5,13 +5,14 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/tipi/tui/panes"
 )
 
 type View uint
 
 const (
 	// Pane views
-	SidebarView View = iota
+	CollectionPaneView View = iota
 	UrlPaneView
 	RequestPaneView
 	ResponsePaneView
@@ -31,36 +32,36 @@ func isModalView(v View) bool {
 type RootModel struct {
 	db *internal.RequestDatabase
 
-	sidebar      SidebarModel
-	urlPane      UrlPaneModel
-	requestPane  RequestPaneModel
-	responsePane ResponsePaneModel
-	navigation   NagivationModel
+	collectionPane panes.CollectionPaneModel
+	urlPane        panes.UrlPaneModel
+	requestPane    panes.RequestPaneModel
+	responsePane   panes.ResponsePaneModel
+	navigation     NagivationModel
 
 	focus View
 
-	width        int
-	height       int
-	sidebarWidth float32
+	width               int
+	height              int
+	collectionPaneWidth float32
 }
 
 type Options func(*RootModel)
 
-func WithSidebarWidth(width float32) Options {
+func WithCollectionPaneWidth(width float32) Options {
 	return func(m *RootModel) {
-		m.sidebarWidth = width
+		m.collectionPaneWidth = width
 	}
 }
 
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 	m := &RootModel{
-		db:           db,
-		sidebar:      SidebarModel{},
-		urlPane:      UrlPaneModel{},
-		requestPane:  RequestPaneModel{},
-		responsePane: ResponsePaneModel{},
-		navigation:   NagivationModel{},
-		focus:        SidebarView,
+		db:             db,
+		collectionPane: panes.CollectionPaneModel{},
+		urlPane:        panes.UrlPaneModel{},
+		requestPane:    panes.RequestPaneModel{},
+		responsePane:   panes.ResponsePaneModel{},
+		navigation:     NagivationModel{},
+		focus:          CollectionPaneView,
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -74,14 +75,14 @@ func (m RootModel) Init() tea.Cmd {
 
 func (m *RootModel) setFocus(v View) {
 	m.focus = v
-	m.sidebar.SetBorderColor("#ffffff")
+	m.collectionPane.SetBorderColor("#ffffff")
 	m.urlPane.SetBorderColor("#ffffff")
 	m.requestPane.SetBorderColor("#ffffff")
 	m.responsePane.SetBorderColor("#ffffff")
 
 	switch v {
-	case SidebarView:
-		m.sidebar.SetBorderColor("#98C379")
+	case CollectionPaneView:
+		m.collectionPane.SetBorderColor("#98C379")
 	case UrlPaneView:
 		m.urlPane.SetBorderColor("#98C379")
 	case RequestPaneView:
@@ -103,7 +104,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if isPaneView(m.focus) {
 			switch msg.String() {
 			case "1":
-				m.setFocus(SidebarView)
+				m.setFocus(CollectionPaneView)
 			case "2":
 				m.setFocus(UrlPaneView)
 			case "3":
@@ -113,8 +114,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		switch m.focus {
-		case SidebarView:
-			m.sidebar, cmd = m.sidebar.Update(msg)
+		case CollectionPaneView:
+			m.collectionPane, cmd = m.collectionPane.Update(msg)
 		case UrlPaneView:
 			m.urlPane, cmd = m.urlPane.Update(msg)
 		case RequestPaneView:
@@ -127,11 +128,11 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width - 2
 		m.height = msg.Height - 3
 
-		sidebarWidth := int(float32(m.width) * m.sidebarWidth)
-		m.sidebar.SetWidth(sidebarWidth)
-		m.sidebar.SetHeight(m.height)
+		collectionPaneWidth := int(float32(m.width) * m.collectionPaneWidth)
+		m.collectionPane.SetWidth(collectionPaneWidth)
+		m.collectionPane.SetHeight(m.height)
 
-		urlPaneWidth := m.width - sidebarWidth - 2
+		urlPaneWidth := m.width - collectionPaneWidth - 2
 		m.urlPane.SetWidth(urlPaneWidth)
 
 		requestPaneWidth := urlPaneWidth / 2
@@ -150,7 +151,7 @@ func (m RootModel) View() string {
 		lipgloss.Left,
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			m.sidebar.View(),
+			m.collectionPane.View(),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				m.urlPane.View(),

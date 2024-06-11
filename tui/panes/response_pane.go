@@ -1,36 +1,36 @@
-package tui
+package panes
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-type RequestPaneModel struct {
+type ResponsePaneModel struct {
 	width       int
 	height      int
 	borderColor string
 }
 
-func (m *RequestPaneModel) SetWidth(width int) {
+func (m *ResponsePaneModel) SetWidth(width int) {
 	m.width = width
 }
 
-func (m *RequestPaneModel) SetHeight(height int) {
+func (m *ResponsePaneModel) SetHeight(height int) {
 	m.height = height
 }
 
-func (m *RequestPaneModel) SetBorderColor(color string) {
+func (m *ResponsePaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
+func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 	return m, nil
 }
 
-func (m RequestPaneModel) View() string {
+func (m ResponsePaneModel) View() string {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: []string{"[3]", "Request"}},
+		GenerateBorderOption{Title: []string{"[4]", "Response"}},
 		m.width,
 	)
 	style := lipgloss.NewStyle().

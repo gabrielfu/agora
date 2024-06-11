@@ -1,36 +1,36 @@
-package tui
+package panes
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-type SidebarModel struct {
+type CollectionPaneModel struct {
 	width       int
 	height      int
 	borderColor string
 }
 
-func (m *SidebarModel) SetWidth(width int) {
+func (m *CollectionPaneModel) SetWidth(width int) {
 	m.width = width
 }
 
-func (m *SidebarModel) SetHeight(height int) {
+func (m *CollectionPaneModel) SetHeight(height int) {
 	m.height = height
 }
 
-func (m *SidebarModel) SetBorderColor(color string) {
+func (m *CollectionPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m SidebarModel) Update(msg tea.Msg) (SidebarModel, tea.Cmd) {
+func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
 	return m, nil
 }
 
-func (m SidebarModel) View() string {
+func (m CollectionPaneModel) View() string {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: []string{"[1]", "Sidebar"}},
+		GenerateBorderOption{Title: []string{"[1]", "Collection"}},
 		m.width,
 	)
 	style := lipgloss.NewStyle().
