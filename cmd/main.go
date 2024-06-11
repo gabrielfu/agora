@@ -17,7 +17,7 @@ func main() {
 	}
 	defer db.Close()
 
-	model := tui.NewRootModel(db, tui.WithCollectionPaneWidth(0.3333))
+	model := tui.NewRootModel(db, tui.WithCollectionPaneWidth(0.33))
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 
 	if _, err := program.Run(); err != nil {
