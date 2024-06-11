@@ -6,8 +6,9 @@ import (
 )
 
 type UrlPaneModel struct {
-	width  int
-	height int
+	width       int
+	height      int
+	borderColor string
 }
 
 func (m *UrlPaneModel) SetWidth(width int) {
@@ -16,6 +17,10 @@ func (m *UrlPaneModel) SetWidth(width int) {
 
 func (m *UrlPaneModel) SetHeight(height int) {
 	m.height = height
+}
+
+func (m *UrlPaneModel) SetBorderColor(color string) {
+	m.borderColor = color
 }
 
 func (m UrlPaneModel) Init() tea.Cmd {
@@ -34,6 +39,7 @@ func (m UrlPaneModel) View() string {
 	)
 	style := lipgloss.NewStyle().
 		BorderStyle(border).
+		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
 	return style.Render()

@@ -18,6 +18,18 @@ func (m NagivationModel) Init() tea.Cmd {
 }
 
 func (m NagivationModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "k":
+			m.content = "Up"
+		case "j":
+			m.content = "Down"
+		default:
+			m.content = "Unknown"
+		}
+	}
 	return m, nil
 }
 

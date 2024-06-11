@@ -6,8 +6,9 @@ import (
 )
 
 type ResponsePaneModel struct {
-	width  int
-	height int
+	width       int
+	height      int
+	borderColor string
 }
 
 func (m *ResponsePaneModel) SetWidth(width int) {
@@ -18,6 +19,9 @@ func (m *ResponsePaneModel) SetHeight(height int) {
 	m.height = height
 }
 
+func (m *ResponsePaneModel) SetBorderColor(color string) {
+	m.borderColor = color
+}
 func (m ResponsePaneModel) Init() tea.Cmd {
 	return nil
 }
@@ -34,6 +38,7 @@ func (m ResponsePaneModel) View() string {
 	)
 	style := lipgloss.NewStyle().
 		BorderStyle(border).
+		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
 	return style.Render()

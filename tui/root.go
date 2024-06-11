@@ -7,6 +7,26 @@ import (
 	"github.com/gabrielfu/tipi/internal"
 )
 
+type View uint
+
+const (
+	// Pane views
+	SidebarView View = iota
+	UrlPaneView
+	RequestPaneView
+	ResponsePaneView
+	// Modal views
+	// ...
+)
+
+func isPaneView(v View) bool {
+	return v <= ResponsePaneView
+}
+
+func isModalView(v View) bool {
+	return !isPaneView(v)
+}
+
 // RootModel implements tea.RootModel interface
 type RootModel struct {
 	db *internal.RequestDatabase
@@ -17,9 +37,10 @@ type RootModel struct {
 	responsePane *ResponsePaneModel
 	navigation   *NagivationModel
 
-	width  int
-	height int
+	focus View
 
+	width        int
+	height       int
 	sidebarWidth float32
 }
 
@@ -39,6 +60,7 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 		requestPane:  &RequestPaneModel{},
 		responsePane: &ResponsePaneModel{},
 		navigation:   &NagivationModel{},
+		focus:        SidebarView,
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -50,12 +72,43 @@ func (m RootModel) Init() tea.Cmd {
 	return textinput.Blink
 }
 
+func (m *RootModel) setFocus(v View) {
+	m.focus = v
+	m.sidebar.SetBorderColor("#ffffff")
+	m.urlPane.SetBorderColor("#ffffff")
+	m.requestPane.SetBorderColor("#ffffff")
+	m.responsePane.SetBorderColor("#ffffff")
+
+	switch v {
+	case SidebarView:
+		m.sidebar.SetBorderColor("#98C379")
+	case UrlPaneView:
+		m.urlPane.SetBorderColor("#98C379")
+	case RequestPaneView:
+		m.requestPane.SetBorderColor("#98C379")
+	case ResponsePaneView:
+		m.responsePane.SetBorderColor("#98C379")
+	}
+}
+
 func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+		}
+		if isPaneView(m.focus) {
+			switch msg.String() {
+			case "1":
+				m.setFocus(SidebarView)
+			case "2":
+				m.setFocus(UrlPaneView)
+			case "3":
+				m.setFocus(RequestPaneView)
+			case "4":
+				m.setFocus(ResponsePaneView)
+			}
 		}
 	case tea.WindowSizeMsg:
 		m.width = msg.Width - 2

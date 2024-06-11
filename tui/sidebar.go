@@ -6,8 +6,9 @@ import (
 )
 
 type SidebarModel struct {
-	width  int
-	height int
+	width       int
+	height      int
+	borderColor string
 }
 
 func (m *SidebarModel) SetWidth(width int) {
@@ -16,6 +17,10 @@ func (m *SidebarModel) SetWidth(width int) {
 
 func (m *SidebarModel) SetHeight(height int) {
 	m.height = height
+}
+
+func (m *SidebarModel) SetBorderColor(color string) {
+	m.borderColor = color
 }
 
 func (m SidebarModel) Init() tea.Cmd {
@@ -34,6 +39,7 @@ func (m SidebarModel) View() string {
 	)
 	style := lipgloss.NewStyle().
 		BorderStyle(border).
+		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
 	return style.Render()
