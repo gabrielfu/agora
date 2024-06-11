@@ -15,6 +15,7 @@ type RootModel struct {
 	urlPane      *UrlPaneModel
 	requestPane  *RequestPaneModel
 	responsePane *ResponsePaneModel
+	navigation   *NagivationModel
 
 	width  int
 	height int
@@ -37,6 +38,7 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 		urlPane:      &UrlPaneModel{},
 		requestPane:  &RequestPaneModel{},
 		responsePane: &ResponsePaneModel{},
+		navigation:   &NagivationModel{},
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -57,7 +59,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		m.width = msg.Width - 2
-		m.height = msg.Height - 2
+		m.height = msg.Height - 3
 
 		sidebarWidth := int(float32(m.width) * m.sidebarWidth)
 		m.sidebar.SetWidth(sidebarWidth)
@@ -78,17 +80,21 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m RootModel) View() string {
-	return lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		m.sidebar.View(),
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			m.urlPane.View(),
-			lipgloss.JoinHorizontal(
-				lipgloss.Top,
-				m.requestPane.View(),
-				m.responsePane.View(),
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			m.sidebar.View(),
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				m.urlPane.View(),
+				lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					m.requestPane.View(),
+					m.responsePane.View(),
+				),
 			),
 		),
+		m.navigation.View(),
 	)
 }
