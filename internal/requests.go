@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 type Request struct {
@@ -16,6 +18,51 @@ type Request struct {
 	Params  map[string]string
 	Headers map[string]string
 	Auth    string
+}
+
+// NewRequest creates a new request with a random id.
+func NewRequest(method, url string) *Request {
+	return &Request{
+		id:      randomID(),
+		Method:  method,
+		URL:     url,
+		Params:  make(map[string]string),
+		Headers: make(map[string]string),
+	}
+}
+
+func randomID() string {
+	return uuid.New().String()
+}
+
+func (r *Request) WithBody(body any) *Request {
+	r.Body = body
+	return r
+}
+
+func (r *Request) WithParam(key, value string) *Request {
+	r.Params[key] = value
+	return r
+}
+
+func (r *Request) WithParams(params map[string]string) *Request {
+	r.Params = params
+	return r
+}
+
+func (r *Request) WithHeader(key, value string) *Request {
+	r.Headers[key] = value
+	return r
+}
+
+func (r *Request) WithHeaders(headers map[string]string) *Request {
+	r.Headers = headers
+	return r
+}
+
+func (r *Request) WithAuth(auth string) *Request {
+	r.Auth = auth
+	return r
 }
 
 func (r *Request) ID() string {
