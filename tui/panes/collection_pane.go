@@ -1,14 +1,19 @@
 package panes
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/internal"
 )
 
 type CollectionPaneModel struct {
 	width       int
 	height      int
 	borderColor string
+
+	requests []internal.Request
 }
 
 func (m *CollectionPaneModel) SetWidth(width int) {
@@ -23,20 +28,31 @@ func (m *CollectionPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
+func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
+	m.requests = requests
+}
+
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
 	return m, nil
 }
 
-func (m CollectionPaneModel) View() string {
+func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
 		GenerateBorderOption{Title: []string{"[1]", "Collection"}},
 		m.width,
 	)
-	style := lipgloss.NewStyle().
+	return lipgloss.NewStyle().
 		BorderStyle(border).
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
-	return style.Render()
+}
+
+func (m CollectionPaneModel) View() string {
+	var text string
+	for _, request := range m.requests {
+		text += fmt.Sprintf("%s %s\n", request.Method, request.URL)
+	}
+	return m.generateStyle().Render(text)
 }

@@ -24,10 +24,6 @@ func isPaneView(v View) bool {
 	return v <= ResponsePaneView
 }
 
-func isModalView(v View) bool {
-	return !isPaneView(v)
-}
-
 // RootModel implements tea.RootModel interface
 type RootModel struct {
 	db *internal.RequestDatabase
@@ -143,6 +139,14 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.responsePane.SetWidth(responsePaneWidth)
 		m.responsePane.SetHeight(m.height - 3)
 	}
+
+	// Set requests for collection pane
+	reqs, err := m.db.ListRequests()
+	if err != nil {
+		return m, tea.Quit
+	}
+	m.collectionPane.SetRequests(reqs)
+
 	return m, tea.Batch(cmds...)
 }
 
