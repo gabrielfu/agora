@@ -29,7 +29,7 @@ func (m RequestPaneModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m RequestPaneModel) View() string {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: "Request"},
+		GenerateBorderOption{Title: []string{"[3]", "Request"}},
 		m.width,
 	)
 	style := lipgloss.NewStyle().

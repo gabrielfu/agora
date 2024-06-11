@@ -29,7 +29,7 @@ func (m SidebarModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m SidebarModel) View() string {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: "Sidebar"},
+		GenerateBorderOption{Title: []string{"[1]", "Sidebar"}},
 		m.width,
 	)
 	style := lipgloss.NewStyle().

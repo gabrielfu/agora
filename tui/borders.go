@@ -7,20 +7,22 @@ import (
 )
 
 type GenerateBorderOption struct {
-	Title  string
-	Footer string
+	Title  []string
+	Footer []string
 }
 
 func generateBorder(border lipgloss.Border, opt GenerateBorderOption, width int) lipgloss.Border {
-	if opt.Title != "" {
-		border.Top = border.Top + opt.Title + strings.Repeat(border.Top, width)
+	if len(opt.Title) > 0 {
+		title := strings.Join(opt.Title, border.Top)
+		border.Top = border.Top + title + strings.Repeat(border.Top, width)
 	}
-	if opt.Footer != "" {
-		repeatCount := width - len(opt.Footer) - 1
+	if len(opt.Footer) > 0 {
+		footer := strings.Join(opt.Footer, border.Bottom)
+		repeatCount := width - len(footer) - 1
 		if repeatCount < 0 {
 			repeatCount = 0
 		}
-		border.Bottom = strings.Repeat(border.Bottom, repeatCount) + opt.Footer + border.Bottom
+		border.Bottom = strings.Repeat(border.Bottom, repeatCount) + footer + border.Bottom
 	}
 	return border
 }

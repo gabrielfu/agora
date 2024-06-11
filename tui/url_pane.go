@@ -27,8 +27,13 @@ func (m UrlPaneModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m UrlPaneModel) View() string {
+	border := generateBorder(
+		lipgloss.RoundedBorder(),
+		GenerateBorderOption{Title: []string{"[2]", "URL"}},
+		m.width,
+	)
 	style := lipgloss.NewStyle().
-		BorderStyle(lipgloss.RoundedBorder()).
+		BorderStyle(border).
 		Width(m.width).
 		Height(m.height)
 	return style.Render()
