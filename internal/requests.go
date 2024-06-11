@@ -12,6 +12,7 @@ import (
 
 type Request struct {
 	id      string
+	Name    string
 	Method  string
 	URL     string
 	Body    any // only supports json body for now
@@ -33,6 +34,11 @@ func NewRequest(method, url string) *Request {
 
 func randomID() string {
 	return uuid.New().String()
+}
+
+func (r *Request) WithName(name string) *Request {
+	r.Name = name
+	return r
 }
 
 func (r *Request) WithBody(body any) *Request {
@@ -71,8 +77,8 @@ func (r *Request) ID() string {
 
 func (r Request) String() string {
 	return fmt.Sprintf(
-		"Request(ID=%s, Method=%s, URL=%s, Body=%v, Params=%v, Headers=%v, Auth=%s}",
-		r.id, r.Method, r.URL, r.Body, r.Params, r.Headers, r.Auth,
+		"Request(ID=%s, Name=%s, Method=%s, URL=%s, Body=%v, Params=%v, Headers=%v, Auth=%s}",
+		r.id, r.Name, r.Method, r.URL, r.Body, r.Params, r.Headers, r.Auth,
 	)
 }
 

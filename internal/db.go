@@ -9,6 +9,7 @@ import (
 
 type RequestDAO struct {
 	id      string
+	Name    string
 	Method  string
 	URL     string
 	Body    string
@@ -32,6 +33,7 @@ func fromRequest(req Request) (RequestDAO, error) {
 	}
 	return RequestDAO{
 		id:      req.ID(),
+		Name:    req.Name,
 		Method:  req.Method,
 		URL:     req.URL,
 		Body:    string(body),
@@ -54,6 +56,7 @@ func (r *RequestDAO) toRequest() (Request, error) {
 	}
 	return Request{
 		id:      r.id,
+		Name:    r.Name,
 		Method:  r.Method,
 		URL:     r.URL,
 		Body:    body,
@@ -90,6 +93,7 @@ func (r *RequestDatabase) Init() error {
 	_, err := r.db.Exec(`
 		CREATE TABLE IF NOT EXISTS requests (
 			id TEXT PRIMARY KEY,
+			name TEXT,
 			method TEXT,
 			url TEXT,
 			body TEXT,
@@ -107,8 +111,8 @@ func (r *RequestDatabase) CreateRequest(req Request) error {
 		return err
 	}
 	_, err = r.db.Exec(
-		"INSERT INTO requests (id, method, url, body, params, headers, auth) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		dao.id, dao.Method, dao.URL, dao.Body, dao.Params, dao.Headers, dao.Auth,
+		"INSERT INTO requests (id, name, method, url, body, params, headers, auth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		dao.id, dao.Name, dao.Method, dao.URL, dao.Body, dao.Params, dao.Headers, dao.Auth,
 	)
 	return err
 }
@@ -116,9 +120,9 @@ func (r *RequestDatabase) CreateRequest(req Request) error {
 func (r *RequestDatabase) GetRequest(id string) (Request, error) {
 	var dao RequestDAO
 	err := r.db.QueryRow(
-		"SELECT id, method, url, body, params, headers, auth FROM requests WHERE id = ?",
+		"SELECT id, name, method, url, body, params, headers, auth FROM requests WHERE id = ?",
 		id,
-	).Scan(&dao.id, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth)
+	).Scan(&dao.id, &dao.Name, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth)
 	if err != nil {
 		return Request{}, err
 	}
@@ -126,7 +130,7 @@ func (r *RequestDatabase) GetRequest(id string) (Request, error) {
 }
 
 func (r *RequestDatabase) ListRequests() ([]Request, error) {
-	rows, err := r.db.Query("SELECT id, method, url, body, params, headers, auth FROM requests")
+	rows, err := r.db.Query("SELECT id, name, method, url, body, params, headers, auth FROM requests")
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +138,7 @@ func (r *RequestDatabase) ListRequests() ([]Request, error) {
 	var requests []Request
 	for rows.Next() {
 		var dao RequestDAO
-		if err := rows.Scan(&dao.id, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth); err != nil {
+		if err := rows.Scan(&dao.id, &dao.Name, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth); err != nil {
 			return nil, err
 		}
 		req, err := dao.toRequest()
@@ -152,8 +156,8 @@ func (r *RequestDatabase) UpdateRequest(req Request) error {
 		return err
 	}
 	_, err = r.db.Exec(
-		"UPDATE requests SET method = ?, url = ?, body = ?, params = ?, headers = ?, auth = ? WHERE id = ?",
-		dao.Method, dao.URL, dao.Body, dao.Params, dao.Headers, dao.Auth, dao.id,
+		"UPDATE requests SET name = ?, method = ?, url = ?, body = ?, params = ?, headers = ?, auth = ? WHERE id = ?",
+		dao.Name, dao.Method, dao.URL, dao.Body, dao.Params, dao.Headers, dao.Auth, dao.id,
 	)
 	return err
 }
