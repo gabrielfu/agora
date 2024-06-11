@@ -69,6 +69,13 @@ func (r *Request) ID() string {
 	return r.id
 }
 
+func (r Request) String() string {
+	return fmt.Sprintf(
+		"Request(ID=%s, Method=%s, URL=%s, Body=%v, Params=%v, Headers=%v, Auth=%s}",
+		r.id, r.Method, r.URL, r.Body, r.Params, r.Headers, r.Auth,
+	)
+}
+
 func makeJsonBodyReader(body any) (io.Reader, error) {
 	marshalled, err := json.Marshal(body)
 	if err != nil {
