@@ -22,11 +22,8 @@ func (m *ResponsePaneModel) SetHeight(height int) {
 func (m *ResponsePaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
-func (m ResponsePaneModel) Init() tea.Cmd {
-	return nil
-}
 
-func (m ResponsePaneModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 	return m, nil
 }
 

@@ -23,11 +23,7 @@ func (m *RequestPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m RequestPaneModel) Init() tea.Cmd {
-	return nil
-}
-
-func (m RequestPaneModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	return m, nil
 }
 

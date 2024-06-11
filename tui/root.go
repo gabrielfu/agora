@@ -31,11 +31,11 @@ func isModalView(v View) bool {
 type RootModel struct {
 	db *internal.RequestDatabase
 
-	sidebar      *SidebarModel
-	urlPane      *UrlPaneModel
-	requestPane  *RequestPaneModel
-	responsePane *ResponsePaneModel
-	navigation   *NagivationModel
+	sidebar      SidebarModel
+	urlPane      UrlPaneModel
+	requestPane  RequestPaneModel
+	responsePane ResponsePaneModel
+	navigation   NagivationModel
 
 	focus View
 
@@ -55,11 +55,11 @@ func WithSidebarWidth(width float32) Options {
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 	m := &RootModel{
 		db:           db,
-		sidebar:      &SidebarModel{},
-		urlPane:      &UrlPaneModel{},
-		requestPane:  &RequestPaneModel{},
-		responsePane: &ResponsePaneModel{},
-		navigation:   &NagivationModel{},
+		sidebar:      SidebarModel{},
+		urlPane:      UrlPaneModel{},
+		requestPane:  RequestPaneModel{},
+		responsePane: ResponsePaneModel{},
+		navigation:   NagivationModel{},
 		focus:        SidebarView,
 	}
 	for _, opt := range opts {
@@ -92,6 +92,8 @@ func (m *RootModel) setFocus(v View) {
 }
 
 func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -110,6 +112,17 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.setFocus(ResponsePaneView)
 			}
 		}
+		switch m.focus {
+		case SidebarView:
+			m.sidebar, cmd = m.sidebar.Update(msg)
+		case UrlPaneView:
+			m.urlPane, cmd = m.urlPane.Update(msg)
+		case RequestPaneView:
+			m.requestPane, cmd = m.requestPane.Update(msg)
+		case ResponsePaneView:
+			m.responsePane, cmd = m.responsePane.Update(msg)
+		}
+		cmds = append(cmds, cmd)
 	case tea.WindowSizeMsg:
 		m.width = msg.Width - 2
 		m.height = msg.Height - 3
@@ -129,7 +142,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.responsePane.SetWidth(responsePaneWidth)
 		m.responsePane.SetHeight(m.height - 3)
 	}
-	return m, nil
+	return m, tea.Batch(cmds...)
 }
 
 func (m RootModel) View() string {

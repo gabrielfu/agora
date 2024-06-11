@@ -23,11 +23,7 @@ func (m *UrlPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m UrlPaneModel) Init() tea.Cmd {
-	return nil
-}
-
-func (m UrlPaneModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 	return m, nil
 }
 

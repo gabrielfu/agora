@@ -23,11 +23,7 @@ func (m *SidebarModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m SidebarModel) Init() tea.Cmd {
-	return nil
-}
-
-func (m SidebarModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m SidebarModel) Update(msg tea.Msg) (SidebarModel, tea.Cmd) {
 	return m, nil
 }
 
