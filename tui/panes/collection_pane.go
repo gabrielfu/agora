@@ -52,7 +52,8 @@ func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 func (m CollectionPaneModel) View() string {
 	var text string
 	for _, request := range m.requests {
-		text += fmt.Sprintf("%s %s\n", request.Method, request.URL)
+		method := RenderMethod(request.Method)
+		text += fmt.Sprintf("%s %s\n", method, request.URL)
 	}
 	return m.generateStyle().Render(text)
 }
