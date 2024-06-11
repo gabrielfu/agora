@@ -49,6 +49,10 @@ func WithCollectionPaneWidth(width float32) Options {
 	}
 }
 
+type SetFocusMsg struct {
+	View View
+}
+
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 	m := &RootModel{
 		db:             db,
@@ -66,7 +70,12 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 }
 
 func (m RootModel) Init() tea.Cmd {
-	return textinput.Blink
+	return tea.Batch(
+		textinput.Blink,
+		func() tea.Msg {
+			return SetFocusMsg{View: CollectionPaneView}
+		},
+	)
 }
 
 func (m *RootModel) setFocus(v View) {
@@ -92,6 +101,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
+	case SetFocusMsg:
+		m.setFocus(msg.View)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
