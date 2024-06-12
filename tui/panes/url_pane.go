@@ -3,12 +3,19 @@ package panes
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/states"
 )
 
 type UrlPaneModel struct {
 	width       int
 	height      int
 	borderColor string
+
+	ctx *states.RequestContext
+}
+
+func NewUrlPaneModel(ctx *states.RequestContext) UrlPaneModel {
+	return UrlPaneModel{ctx: ctx}
 }
 
 func (m *UrlPaneModel) SetWidth(width int) {
@@ -38,5 +45,9 @@ func (m UrlPaneModel) View() string {
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
-	return style.Render()
+	var text string
+	if !m.ctx.Empty() {
+		text = m.ctx.Request().URL
+	}
+	return style.Render(text)
 }

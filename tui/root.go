@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
 	"github.com/gabrielfu/tipi/tui/panes"
+	"github.com/gabrielfu/tipi/tui/states"
 )
 
 type View uint
@@ -40,6 +41,7 @@ type RootModel struct {
 	navigation     NagivationModel
 
 	focus View
+	ctx   *states.RequestContext
 
 	width               int
 	height              int
@@ -59,14 +61,16 @@ type SetFocusMsg struct {
 }
 
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
+	ctx := states.NewRequestContext()
 	m := &RootModel{
 		db:             db,
-		collectionPane: panes.NewCollectionPaneModel(),
-		urlPane:        panes.UrlPaneModel{},
+		collectionPane: panes.NewCollectionPaneModel(ctx),
+		urlPane:        panes.NewUrlPaneModel(ctx),
 		requestPane:    panes.RequestPaneModel{},
 		responsePane:   panes.ResponsePaneModel{},
 		navigation:     NagivationModel{},
 		focus:          CollectionPaneView,
+		ctx:            ctx,
 	}
 	for _, opt := range opts {
 		opt(m)

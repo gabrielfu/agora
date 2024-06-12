@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/tipi/tui/states"
 )
 
 type CollectionPaneModel struct {
@@ -17,9 +18,10 @@ type CollectionPaneModel struct {
 
 	requests []internal.Request
 	table    table.Model
+	ctx      *states.RequestContext
 }
 
-func NewCollectionPaneModel() CollectionPaneModel {
+func NewCollectionPaneModel(ctx *states.RequestContext) CollectionPaneModel {
 	s := table.DefaultStyles()
 	s.Selected = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFFFF")).
@@ -34,7 +36,7 @@ func NewCollectionPaneModel() CollectionPaneModel {
 		table.WithStyles(s),
 	)
 
-	return CollectionPaneModel{table: t}
+	return CollectionPaneModel{table: t, ctx: ctx}
 }
 
 func makeColumns(width int) []table.Column {
@@ -68,6 +70,7 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 		rows = append(rows, table.Row{method, u})
 	}
 	m.table.SetRows(rows)
+	m.Update(nil)
 }
 
 func (m CollectionPaneModel) footer() string {
@@ -92,7 +95,13 @@ func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
 	var cmd tea.Cmd
+	// process key messages to the table model
 	m.table, cmd = m.table.Update(msg)
+	// retrieve the request object and set the context
+	cursor := m.table.Cursor()
+	if cursor >= 0 && cursor < len(m.requests) {
+		m.ctx.SetRequest(&m.requests[cursor])
+	}
 	return m, cmd
 }
 
