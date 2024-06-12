@@ -56,7 +56,7 @@ type SetFocusMsg struct {
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 	m := &RootModel{
 		db:             db,
-		collectionPane: panes.CollectionPaneModel{},
+		collectionPane: panes.NewCollectionPaneModel(),
 		urlPane:        panes.UrlPaneModel{},
 		requestPane:    panes.RequestPaneModel{},
 		responsePane:   panes.ResponsePaneModel{},

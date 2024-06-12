@@ -1,7 +1,6 @@
 package panes
 
 import (
-	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 )
 
@@ -40,7 +39,8 @@ func getMethodShort(method string) string {
 }
 
 func RenderMethod(method string) string {
-	color := getMethodColor(method)
+	// color := getMethodColor(method)
 	short := getMethodShort(method)
-	return lipgloss.NewStyle().Foreground(lipgloss.Color(color)).Render(short)
+	return short
+	// return lipgloss.NewStyle().Inline(true).Foreground(lipgloss.Color(color)).Render(short)
 }
