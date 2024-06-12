@@ -113,6 +113,6 @@ func (m CollectionPaneModel) renderTableWithoutHeader() string {
 }
 
 func (m CollectionPaneModel) View() string {
-	t := m.renderTableWithoutHeader()
-	return m.generateStyle().Render(t)
+	text := m.renderTableWithoutHeader()
+	return m.generateStyle().Render(text)
 }

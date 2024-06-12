@@ -34,17 +34,20 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 	return m, nil
 }
 
-func (m UrlPaneModel) View() string {
+func (m UrlPaneModel) generateStyle() lipgloss.Style {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
 		GenerateBorderOption{Title: []string{"[2]", "URL"}},
 		m.width,
 	)
-	style := lipgloss.NewStyle().
+	return lipgloss.NewStyle().
 		BorderStyle(border).
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
+}
+
+func (m UrlPaneModel) View() string {
 	var text string
 	if !m.ctx.Empty() {
 		request := m.ctx.Request()
@@ -52,5 +55,5 @@ func (m UrlPaneModel) View() string {
 		u := RenderURL(request.URL)
 		text = method + " " + u
 	}
-	return style.Render(text)
+	return m.generateStyle().Render(text)
 }
