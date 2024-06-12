@@ -1,6 +1,7 @@
 package panes
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
@@ -69,10 +70,17 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 	m.table.SetRows(rows)
 }
 
+func (m CollectionPaneModel) footer() string {
+	return strconv.Itoa(m.table.Cursor()+1) + " / " + strconv.Itoa(len(m.table.Rows()))
+}
+
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: []string{"[1]", "Collection"}},
+		GenerateBorderOption{
+			Title:  []string{"[1]", "Collection"},
+			Footer: []string{m.footer()},
+		},
 		m.width,
 	)
 	return lipgloss.NewStyle().
@@ -83,7 +91,9 @@ func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
-	return m, nil
+	var cmd tea.Cmd
+	m.table, cmd = m.table.Update(msg)
+	return m, cmd
 }
 
 func (m CollectionPaneModel) renderTableWithoutHeader() string {
