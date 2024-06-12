@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
 	"github.com/gabrielfu/tipi/tui/states"
+	"github.com/gabrielfu/tipi/tui/styles"
 )
 
 type CollectionPaneModel struct {
@@ -80,9 +81,9 @@ func (m CollectionPaneModel) footer() string {
 }
 
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
-	border := generateBorder(
+	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{
+		styles.GenerateBorderOption{
 			Title:  []string{"[1]", "Collection"},
 			Footer: []string{m.footer()},
 		},

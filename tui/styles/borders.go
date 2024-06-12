@@ -1,4 +1,4 @@
-package panes
+package styles
 
 import (
 	"strings"
@@ -11,7 +11,7 @@ type GenerateBorderOption struct {
 	Footer []string
 }
 
-func generateBorder(border lipgloss.Border, opt GenerateBorderOption, width int) lipgloss.Border {
+func GenerateBorder(border lipgloss.Border, opt GenerateBorderOption, width int) lipgloss.Border {
 	if len(opt.Title) > 0 {
 		title := strings.Join(opt.Title, border.Top)
 		border.Top = border.Top + title + strings.Repeat(border.Top, width)

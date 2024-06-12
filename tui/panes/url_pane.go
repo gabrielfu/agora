@@ -4,6 +4,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/tui/states"
+	"github.com/gabrielfu/tipi/tui/styles"
 )
 
 type UrlPaneModel struct {
@@ -31,9 +32,9 @@ func (m *UrlPaneModel) SetBorderColor(color string) {
 }
 
 func (m UrlPaneModel) generateStyle() lipgloss.Style {
-	border := generateBorder(
+	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: []string{"[2]", "URL"}},
+		styles.GenerateBorderOption{Title: []string{"[2]", "URL"}},
 		m.width,
 	)
 	return lipgloss.NewStyle().

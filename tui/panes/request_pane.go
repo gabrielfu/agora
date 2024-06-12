@@ -4,6 +4,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/tui/states"
+	"github.com/gabrielfu/tipi/tui/styles"
 )
 
 type RequestPaneModel struct {
@@ -31,9 +32,9 @@ func (m *RequestPaneModel) SetBorderColor(color string) {
 }
 
 func (m RequestPaneModel) generateStyle() lipgloss.Style {
-	border := generateBorder(
+	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: []string{"[3]", "Request"}},
+		styles.GenerateBorderOption{Title: []string{"[3]", "Request"}},
 		m.width,
 	)
 	return lipgloss.NewStyle().

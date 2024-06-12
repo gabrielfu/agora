@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/tui/states"
+	"github.com/gabrielfu/tipi/tui/styles"
 )
 
 type ResponsePaneModel struct {
@@ -41,9 +42,9 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	if m.ready && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	}
-	border := generateBorder(
+	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		GenerateBorderOption{Title: []string{"[4]", "Response"}, Footer: footer},
+		styles.GenerateBorderOption{Title: []string{"[4]", "Response"}, Footer: footer},
 		m.width,
 	)
 	return lipgloss.NewStyle().
