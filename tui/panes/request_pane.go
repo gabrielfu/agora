@@ -3,12 +3,19 @@ package panes
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/states"
 )
 
 type RequestPaneModel struct {
 	width       int
 	height      int
 	borderColor string
+
+	ctx *states.RequestContext
+}
+
+func NewRequestPaneModel(ctx *states.RequestContext) RequestPaneModel {
+	return RequestPaneModel{ctx: ctx}
 }
 
 func (m *RequestPaneModel) SetWidth(width int) {
@@ -41,5 +48,12 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m RequestPaneModel) View() string {
-	return m.generateStyle().Render()
+	var text string
+	if !m.ctx.Empty() {
+		request := m.ctx.Request()
+		if request != nil {
+			text = request.String()
+		}
+	}
+	return m.generateStyle().Render(text)
 }

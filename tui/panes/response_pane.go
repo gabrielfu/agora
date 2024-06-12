@@ -48,5 +48,12 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m ResponsePaneModel) View() string {
-	return m.generateStyle().Render()
+	var text string
+	if !m.ctx.Empty() {
+		response := m.ctx.Response()
+		if response != nil {
+			text = response.String()
+		}
+	}
+	return m.generateStyle().Render(text)
 }
