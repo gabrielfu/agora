@@ -11,11 +11,11 @@ type UrlPaneModel struct {
 	height      int
 	borderColor string
 
-	ctx *states.RequestContext
+	rctx *states.RequestContext
 }
 
-func NewUrlPaneModel(ctx *states.RequestContext) UrlPaneModel {
-	return UrlPaneModel{ctx: ctx}
+func NewUrlPaneModel(rctx *states.RequestContext) UrlPaneModel {
+	return UrlPaneModel{rctx: rctx}
 }
 
 func (m *UrlPaneModel) SetWidth(width int) {
@@ -49,8 +49,8 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 
 func (m UrlPaneModel) View() string {
 	var text string
-	if !m.ctx.Empty() {
-		request := m.ctx.Request()
+	if !m.rctx.Empty() {
+		request := m.rctx.Request()
 		method := RenderMethodWithColor(request.Method)
 		u := RenderURL(request.URL)
 		text = method + " " + u

@@ -19,10 +19,10 @@ type CollectionPaneModel struct {
 	requests []internal.Request
 	table    table.Model
 	cursor   int
-	ctx      *states.RequestContext
+	rctx     *states.RequestContext
 }
 
-func NewCollectionPaneModel(ctx *states.RequestContext) CollectionPaneModel {
+func NewCollectionPaneModel(rctx *states.RequestContext) CollectionPaneModel {
 	s := table.DefaultStyles()
 	s.Selected = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFFFF")).
@@ -37,7 +37,7 @@ func NewCollectionPaneModel(ctx *states.RequestContext) CollectionPaneModel {
 		table.WithStyles(s),
 	)
 
-	return CollectionPaneModel{table: t, ctx: ctx}
+	return CollectionPaneModel{table: t, rctx: rctx}
 }
 
 func makeColumns(width int) []table.Column {
@@ -108,7 +108,7 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "e":
-			m.ctx.Exec()
+			m.rctx.Exec()
 		}
 	}
 
@@ -117,11 +117,11 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 	// retrieve the request object and set the context
 	cursor := m.table.Cursor()
 	if m.cursor != cursor {
-		m.ctx.Clear()
+		m.rctx.Clear()
 		m.cursor = cursor
 	}
 	if cursor >= 0 && cursor < len(m.requests) {
-		m.ctx.SetRequest(&m.requests[cursor])
+		m.rctx.SetRequest(&m.requests[cursor])
 	}
 	return m, cmd
 }

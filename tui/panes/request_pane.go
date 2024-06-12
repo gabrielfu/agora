@@ -11,11 +11,11 @@ type RequestPaneModel struct {
 	height      int
 	borderColor string
 
-	ctx *states.RequestContext
+	rctx *states.RequestContext
 }
 
-func NewRequestPaneModel(ctx *states.RequestContext) RequestPaneModel {
-	return RequestPaneModel{ctx: ctx}
+func NewRequestPaneModel(rctx *states.RequestContext) RequestPaneModel {
+	return RequestPaneModel{rctx: rctx}
 }
 
 func (m *RequestPaneModel) SetWidth(width int) {
@@ -49,8 +49,8 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 
 func (m RequestPaneModel) View() string {
 	var text string
-	if !m.ctx.Empty() {
-		request := m.ctx.Request()
+	if !m.rctx.Empty() {
+		request := m.rctx.Request()
 		if request != nil {
 			text = request.String()
 		}

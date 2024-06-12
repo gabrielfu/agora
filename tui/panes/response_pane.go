@@ -14,14 +14,14 @@ type ResponsePaneModel struct {
 	height      int
 	borderColor string
 
-	ctx      *states.RequestContext
+	rctx     *states.RequestContext
 	ready    bool
 	state    string // state is the current error or response state
 	viewport viewport.Model
 }
 
-func NewResponsePaneModel(ctx *states.RequestContext) ResponsePaneModel {
-	return ResponsePaneModel{ctx: ctx}
+func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
+	return ResponsePaneModel{rctx: rctx}
 }
 
 func (m *ResponsePaneModel) SetWidth(width int) {
@@ -54,15 +54,15 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m *ResponsePaneModel) Refresh() {
-	if m.ctx.Empty() {
+	if m.rctx.Empty() {
 		m.viewport.SetContent("")
 		return
 	}
 
 	var text string
 	refresh := false
-	err := m.ctx.Error()
-	response := m.ctx.Response()
+	err := m.rctx.Error()
+	response := m.rctx.Response()
 	if err != nil {
 		text = err.Error()
 		if text != m.state {

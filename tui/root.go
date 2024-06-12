@@ -41,7 +41,7 @@ type RootModel struct {
 	navigation     NagivationModel
 
 	focus View
-	ctx   *states.RequestContext
+	rctx  *states.RequestContext
 
 	width               int
 	height              int
@@ -61,16 +61,16 @@ type SetFocusMsg struct {
 }
 
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
-	ctx := states.NewRequestContext()
+	rctx := states.NewRequestContext()
 	m := &RootModel{
 		db:             db,
-		collectionPane: panes.NewCollectionPaneModel(ctx),
-		urlPane:        panes.NewUrlPaneModel(ctx),
-		requestPane:    panes.NewRequestPaneModel(ctx),
-		responsePane:   panes.NewResponsePaneModel(ctx),
+		collectionPane: panes.NewCollectionPaneModel(rctx),
+		urlPane:        panes.NewUrlPaneModel(rctx),
+		requestPane:    panes.NewRequestPaneModel(rctx),
+		responsePane:   panes.NewResponsePaneModel(rctx),
 		navigation:     NagivationModel{},
 		focus:          CollectionPaneView,
-		ctx:            ctx,
+		rctx:           rctx,
 	}
 	for _, opt := range opts {
 		opt(m)
