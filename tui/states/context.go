@@ -2,6 +2,7 @@
 package states
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
@@ -56,11 +57,16 @@ func (c *RequestContext) Exec() {
 	response, err := c.req.Exec()
 	c.err = err
 	if err != nil {
+		fmt.Println("Error:", err)
 		return
 	}
 
-	var content []byte
-	io.ReadFull(response.Body, content)
+	content, err := io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println("Error:", err)
+		c.err = err
+		return
+	}
 
 	headers := make(map[string]string)
 	for k, v := range response.Header {

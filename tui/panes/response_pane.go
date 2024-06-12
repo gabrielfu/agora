@@ -49,9 +49,14 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 func (m ResponsePaneModel) View() string {
 	var text string
 	if !m.ctx.Empty() {
-		response := m.ctx.Response()
-		if response != nil {
-			text = response.String()
+		err := m.ctx.Error()
+		if err != nil {
+			text = err.Error()
+		} else {
+			response := m.ctx.Response()
+			if response != nil {
+				text = response.String()
+			}
 		}
 	}
 	return m.generateStyle().Render(text)

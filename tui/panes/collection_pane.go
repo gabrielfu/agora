@@ -18,6 +18,7 @@ type CollectionPaneModel struct {
 
 	requests []internal.Request
 	table    table.Model
+	cursor   int
 	ctx      *states.RequestContext
 }
 
@@ -102,10 +103,23 @@ func (m CollectionPaneModel) renderTableWithoutHeader() string {
 
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
 	var cmd tea.Cmd
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "e":
+			m.ctx.Exec()
+		}
+	}
+
 	// process key messages to the table model
 	m.table, cmd = m.table.Update(msg)
 	// retrieve the request object and set the context
 	cursor := m.table.Cursor()
+	if m.cursor != cursor {
+		m.ctx.Clear()
+		m.cursor = cursor
+	}
 	if cursor >= 0 && cursor < len(m.requests) {
 		m.ctx.SetRequest(&m.requests[cursor])
 	}
