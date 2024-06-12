@@ -95,6 +95,8 @@ func (m *RootModel) setFocus(v View) {
 	case ResponsePaneView:
 		m.responsePane.SetBorderColor("#98C379")
 	}
+
+	m.navigation.SetFocus(v)
 }
 
 func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

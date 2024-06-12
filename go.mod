@@ -9,6 +9,8 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22
 )
 
+require github.com/elliotchance/orderedmap/v2 v2.2.0
+
 require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
