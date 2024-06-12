@@ -55,6 +55,7 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 
 func (m *ResponsePaneModel) Refresh() {
 	if m.ctx.Empty() {
+		m.viewport.SetContent("")
 		return
 	}
 
