@@ -1,6 +1,9 @@
 package states
 
+import "github.com/gabrielfu/tipi/tui/views"
+
 type Viewable interface {
+	Prev() views.View
 	View() string
 }
 

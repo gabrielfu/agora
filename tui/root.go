@@ -9,27 +9,8 @@ import (
 	"github.com/gabrielfu/tipi/tui/panes"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/tipi/tui/views"
 )
-
-type View uint
-
-const (
-	// Pane views
-	CollectionPaneView View = iota
-	UrlPaneView
-	RequestPaneView
-	ResponsePaneView
-	// Dialog views
-	SelectMethodDialogView
-)
-
-func isPaneView(v View) bool {
-	return v <= ResponsePaneView
-}
-
-func isDialogView(v View) bool {
-	return v >= SelectMethodDialogView
-}
 
 // RootModel implements tea.RootModel interface
 type RootModel struct {
@@ -41,7 +22,7 @@ type RootModel struct {
 	responsePane   panes.ResponsePaneModel
 	navigation     NagivationModel
 
-	focus View
+	focus views.View
 	rctx  *states.RequestContext
 	dctx  *states.DialogContext
 
@@ -59,7 +40,7 @@ func WithCollectionPaneWidth(width float32) Options {
 }
 
 type SetFocusMsg struct {
-	View View
+	View views.View
 }
 
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
@@ -72,7 +53,7 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 		requestPane:    panes.NewRequestPaneModel(rctx),
 		responsePane:   panes.NewResponsePaneModel(rctx),
 		navigation:     NagivationModel{},
-		focus:          CollectionPaneView,
+		focus:          views.CollectionPaneView,
 		rctx:           rctx,
 		dctx:           dctx,
 	}
@@ -86,12 +67,12 @@ func (m RootModel) Init() tea.Cmd {
 	return tea.Batch(
 		textinput.Blink,
 		func() tea.Msg {
-			return SetFocusMsg{View: CollectionPaneView}
+			return SetFocusMsg{View: views.CollectionPaneView}
 		},
 	)
 }
 
-func (m *RootModel) setFocus(v View) {
+func (m *RootModel) setFocus(v views.View) {
 	m.focus = v
 	m.collectionPane.SetBorderColor(styles.DefaultBorderColor)
 	m.urlPane.SetBorderColor(styles.DefaultBorderColor)
@@ -99,13 +80,13 @@ func (m *RootModel) setFocus(v View) {
 	m.responsePane.SetBorderColor(styles.DefaultBorderColor)
 
 	switch v {
-	case CollectionPaneView:
+	case views.CollectionPaneView:
 		m.collectionPane.SetBorderColor(styles.FocusBorderColor)
-	case UrlPaneView:
+	case views.UrlPaneView:
 		m.urlPane.SetBorderColor(styles.FocusBorderColor)
-	case RequestPaneView:
+	case views.RequestPaneView:
 		m.requestPane.SetBorderColor(styles.FocusBorderColor)
-	case ResponsePaneView:
+	case views.ResponsePaneView:
 		m.responsePane.SetBorderColor(styles.FocusBorderColor)
 	}
 
@@ -132,7 +113,7 @@ func (m *RootModel) updateDialogFocus() {
 	if !m.dctx.Empty() {
 		switch m.dctx.Dialog().(type) {
 		case dialogs.SelectMethodDialog:
-			m.setFocus(SelectMethodDialogView)
+			m.setFocus(views.SelectMethodDialogView)
 		}
 	}
 }
@@ -149,34 +130,35 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 		// switch focus
-		if isPaneView(m.focus) {
+		if views.IsPaneView(m.focus) {
 			switch msg.String() {
 			case "1":
-				m.setFocus(CollectionPaneView)
+				m.setFocus(views.CollectionPaneView)
 			case "2":
-				m.setFocus(UrlPaneView)
+				m.setFocus(views.UrlPaneView)
 			case "3":
-				m.setFocus(RequestPaneView)
+				m.setFocus(views.RequestPaneView)
 			case "4":
-				m.setFocus(ResponsePaneView)
+				m.setFocus(views.ResponsePaneView)
 			}
 		}
-		if isDialogView(m.focus) {
+		if views.IsDialogView(m.focus) {
 			switch msg.String() {
 			case "esc":
+				prev := m.dctx.Dialog().Prev()
 				m.dctx.Clear()
-				m.setFocus(CollectionPaneView)
+				m.setFocus(prev)
 			}
 		}
 		// update focused pane
 		switch m.focus {
-		case CollectionPaneView:
+		case views.CollectionPaneView:
 			m.collectionPane, cmd = m.collectionPane.Update(msg)
-		case UrlPaneView:
+		case views.UrlPaneView:
 			m.urlPane, cmd = m.urlPane.Update(msg)
-		case RequestPaneView:
+		case views.RequestPaneView:
 			m.requestPane, cmd = m.requestPane.Update(msg)
-		case ResponsePaneView:
+		case views.ResponsePaneView:
 			m.responsePane, cmd = m.responsePane.Update(msg)
 		}
 		cmds = append(cmds, cmd)

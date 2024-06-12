@@ -5,18 +5,19 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/views"
 )
 
 type NagivationModel struct {
 	content string
-	focus   View
+	focus   views.View
 }
 
 func (m *NagivationModel) SetContent(content string) {
 	m.content = content
 }
 
-func (m *NagivationModel) SetFocus(focus View) {
+func (m *NagivationModel) SetFocus(focus views.View) {
 	m.focus = focus
 	m.updateNagivationContent()
 }
@@ -32,11 +33,13 @@ func (m *NagivationModel) renderKeymap(keymap *Keymap) string {
 func (m *NagivationModel) updateNagivationContent() {
 	var keymap *Keymap = EmptyKeymap
 	switch m.focus {
-	case CollectionPaneView:
+	case views.CollectionPaneView:
 		keymap = CollectionPaneKeymap
-	case UrlPaneView:
-	case RequestPaneView:
-	case ResponsePaneView:
+	case views.UrlPaneView:
+	case views.RequestPaneView:
+	case views.ResponsePaneView:
+	case views.SelectMethodDialogView:
+		keymap = SelectMethodDialogKeymap
 	}
 	m.content = m.renderKeymap(keymap)
 }

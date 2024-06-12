@@ -4,6 +4,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/tipi/tui/views"
 )
 
 type SelectMethodDialog struct {
@@ -35,6 +36,10 @@ func (m SelectMethodDialog) generateStyle() lipgloss.Style {
 		Width(m.width).
 		Height(m.height).
 		Padding(0, 1)
+}
+
+func (m SelectMethodDialog) Prev() views.View {
+	return views.UrlPaneView
 }
 
 func (m SelectMethodDialog) Update(msg tea.Msg) (SelectMethodDialog, tea.Cmd) {
