@@ -29,11 +29,6 @@ func (m *ResponsePaneModel) SetHeight(height int) {
 func (m *ResponsePaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
-
-func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
-	return m, nil
-}
-
 func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
@@ -45,6 +40,10 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
+}
+
+func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
+	return m, nil
 }
 
 func (m ResponsePaneModel) View() string {

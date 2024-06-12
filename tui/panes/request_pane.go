@@ -30,10 +30,6 @@ func (m *RequestPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
-	return m, nil
-}
-
 func (m RequestPaneModel) generateStyle() lipgloss.Style {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
@@ -45,6 +41,10 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
+}
+
+func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
+	return m, nil
 }
 
 func (m RequestPaneModel) View() string {

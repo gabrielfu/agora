@@ -94,6 +94,12 @@ func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 		Height(m.height)
 }
 
+func (m CollectionPaneModel) renderTableWithoutHeader() string {
+	t := m.table.View()
+	ts := strings.SplitN(t, "\n", 2)
+	return ts[len(ts)-1]
+}
+
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// process key messages to the table model
@@ -104,12 +110,6 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 		m.ctx.SetRequest(&m.requests[cursor])
 	}
 	return m, cmd
-}
-
-func (m CollectionPaneModel) renderTableWithoutHeader() string {
-	t := m.table.View()
-	ts := strings.SplitN(t, "\n", 2)
-	return ts[len(ts)-1]
 }
 
 func (m CollectionPaneModel) View() string {

@@ -30,10 +30,6 @@ func (m *UrlPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
-func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
-	return m, nil
-}
-
 func (m UrlPaneModel) generateStyle() lipgloss.Style {
 	border := generateBorder(
 		lipgloss.RoundedBorder(),
@@ -45,6 +41,10 @@ func (m UrlPaneModel) generateStyle() lipgloss.Style {
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
+}
+
+func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
+	return m, nil
 }
 
 func (m UrlPaneModel) View() string {
