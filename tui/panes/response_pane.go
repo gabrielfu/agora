@@ -58,11 +58,10 @@ func (m *ResponsePaneModel) Refresh() {
 		return
 	}
 
+	var text string
 	refresh := false
 	err := m.ctx.Error()
 	response := m.ctx.Response()
-
-	var text string
 	if err != nil {
 		text = err.Error()
 		if text != m.state {
@@ -79,7 +78,6 @@ func (m *ResponsePaneModel) Refresh() {
 	if refresh {
 		m.viewport.SetContent(text)
 	}
-
 }
 
 func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
