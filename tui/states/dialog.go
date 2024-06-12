@@ -1,14 +1,18 @@
 package states
 
-import "github.com/gabrielfu/tipi/tui/views"
+import (
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gabrielfu/tipi/tui/views"
+)
 
-type Viewable interface {
+type Dialog interface {
 	Prev() views.View
+	Update(tea.Msg) (any, tea.Cmd)
 	View() string
 }
 
 type DialogContext struct {
-	dialog Viewable
+	dialog Dialog
 }
 
 func NewDialogContext() *DialogContext {
@@ -26,11 +30,11 @@ func (d *DialogContext) View() string {
 	return d.dialog.View()
 }
 
-func (d *DialogContext) Dialog() Viewable {
+func (d *DialogContext) Dialog() Dialog {
 	return d.dialog
 }
 
-func (d *DialogContext) SetDialog(dialog Viewable) {
+func (d *DialogContext) SetDialog(dialog Dialog) {
 	d.dialog = dialog
 }
 

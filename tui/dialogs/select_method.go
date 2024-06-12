@@ -42,7 +42,7 @@ func (m SelectMethodDialog) Prev() views.View {
 	return views.UrlPaneView
 }
 
-func (m SelectMethodDialog) Update(msg tea.Msg) (SelectMethodDialog, tea.Cmd) {
+func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	return m, nil
 }
 
