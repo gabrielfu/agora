@@ -47,7 +47,10 @@ func (m UrlPaneModel) View() string {
 		Height(m.height)
 	var text string
 	if !m.ctx.Empty() {
-		text = m.ctx.Request().URL
+		request := m.ctx.Request()
+		method := RenderMethodWithColor(request.Method)
+		u := RenderURL(request.URL)
+		text = method + " " + u
 	}
 	return style.Render(text)
 }
