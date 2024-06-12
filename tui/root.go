@@ -24,6 +24,11 @@ func isPaneView(v View) bool {
 	return v <= ResponsePaneView
 }
 
+const (
+	DefaultColor     = "#DCDFE4"
+	FocusBorderColor = "#98C379"
+)
+
 // RootModel implements tea.RootModel interface
 type RootModel struct {
 	db *internal.RequestDatabase
@@ -80,20 +85,20 @@ func (m RootModel) Init() tea.Cmd {
 
 func (m *RootModel) setFocus(v View) {
 	m.focus = v
-	m.collectionPane.SetBorderColor("#ffffff")
-	m.urlPane.SetBorderColor("#ffffff")
-	m.requestPane.SetBorderColor("#ffffff")
-	m.responsePane.SetBorderColor("#ffffff")
+	m.collectionPane.SetBorderColor(DefaultColor)
+	m.urlPane.SetBorderColor(DefaultColor)
+	m.requestPane.SetBorderColor(DefaultColor)
+	m.responsePane.SetBorderColor(DefaultColor)
 
 	switch v {
 	case CollectionPaneView:
-		m.collectionPane.SetBorderColor("#98C379")
+		m.collectionPane.SetBorderColor(FocusBorderColor)
 	case UrlPaneView:
-		m.urlPane.SetBorderColor("#98C379")
+		m.urlPane.SetBorderColor(FocusBorderColor)
 	case RequestPaneView:
-		m.requestPane.SetBorderColor("#98C379")
+		m.requestPane.SetBorderColor(FocusBorderColor)
 	case ResponsePaneView:
-		m.responsePane.SetBorderColor("#98C379")
+		m.responsePane.SetBorderColor(FocusBorderColor)
 	}
 
 	m.navigation.SetFocus(v)
