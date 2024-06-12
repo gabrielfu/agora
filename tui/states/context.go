@@ -73,9 +73,9 @@ func (c *RequestContext) Exec() {
 		headers[k] = strings.Join(v, ", ")
 	}
 
-	c.resp = &internal.Response{
-		StatusCode: response.StatusCode,
-		Content:    content,
-		Headers:    headers,
-	}
+	c.resp = internal.NewResponse(
+		response.StatusCode,
+		content,
+		headers,
+	)
 }

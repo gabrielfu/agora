@@ -108,6 +108,22 @@ func (m *RootModel) setFocus(v View) {
 	m.navigation.SetFocus(v)
 }
 
+func (m *RootModel) updatePanes(msg tea.Msg) tea.Cmd {
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
+	m.collectionPane, cmd = m.collectionPane.Update(msg)
+	cmds = append(cmds, cmd)
+	m.urlPane, cmd = m.urlPane.Update(msg)
+	cmds = append(cmds, cmd)
+	m.requestPane, cmd = m.requestPane.Update(msg)
+	cmds = append(cmds, cmd)
+	m.responsePane, cmd = m.responsePane.Update(msg)
+	cmds = append(cmds, cmd)
+	return tea.Batch(cmds...)
+}
+
 func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
@@ -119,6 +135,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		}
+		// switch focus
 		if isPaneView(m.focus) {
 			switch msg.String() {
 			case "1":
@@ -131,6 +148,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.setFocus(ResponsePaneView)
 			}
 		}
+		// update focused pane
 		switch m.focus {
 		case CollectionPaneView:
 			m.collectionPane, cmd = m.collectionPane.Update(msg)
@@ -160,6 +178,9 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		responsePaneWidth := urlPaneWidth - requestPaneWidth - 2
 		m.responsePane.SetWidth(responsePaneWidth)
 		m.responsePane.SetHeight(m.height - 3)
+
+		cmd = m.updatePanes(msg)
+		cmds = append(cmds, cmd)
 	}
 
 	// Set requests for collection pane
@@ -168,6 +189,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 	m.collectionPane.SetRequests(reqs)
+	m.responsePane.Refresh()
 
 	return m, tea.Batch(cmds...)
 }
