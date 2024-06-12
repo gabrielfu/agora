@@ -7,6 +7,7 @@ import (
 	"github.com/gabrielfu/tipi/internal"
 	"github.com/gabrielfu/tipi/tui/panes"
 	"github.com/gabrielfu/tipi/tui/states"
+	"github.com/gabrielfu/tipi/tui/styles"
 )
 
 type View uint
@@ -24,11 +25,6 @@ const (
 func isPaneView(v View) bool {
 	return v <= ResponsePaneView
 }
-
-const (
-	DefaultColor     = "#DCDFE4"
-	FocusBorderColor = "#98C379"
-)
 
 // RootModel implements tea.RootModel interface
 type RootModel struct {
@@ -89,20 +85,20 @@ func (m RootModel) Init() tea.Cmd {
 
 func (m *RootModel) setFocus(v View) {
 	m.focus = v
-	m.collectionPane.SetBorderColor(DefaultColor)
-	m.urlPane.SetBorderColor(DefaultColor)
-	m.requestPane.SetBorderColor(DefaultColor)
-	m.responsePane.SetBorderColor(DefaultColor)
+	m.collectionPane.SetBorderColor(styles.DefaultBorderColor)
+	m.urlPane.SetBorderColor(styles.DefaultBorderColor)
+	m.requestPane.SetBorderColor(styles.DefaultBorderColor)
+	m.responsePane.SetBorderColor(styles.DefaultBorderColor)
 
 	switch v {
 	case CollectionPaneView:
-		m.collectionPane.SetBorderColor(FocusBorderColor)
+		m.collectionPane.SetBorderColor(styles.FocusBorderColor)
 	case UrlPaneView:
-		m.urlPane.SetBorderColor(FocusBorderColor)
+		m.urlPane.SetBorderColor(styles.FocusBorderColor)
 	case RequestPaneView:
-		m.requestPane.SetBorderColor(FocusBorderColor)
+		m.requestPane.SetBorderColor(styles.FocusBorderColor)
 	case ResponsePaneView:
-		m.responsePane.SetBorderColor(FocusBorderColor)
+		m.responsePane.SetBorderColor(styles.FocusBorderColor)
 	}
 
 	m.navigation.SetFocus(v)

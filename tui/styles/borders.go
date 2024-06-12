@@ -6,6 +6,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const (
+	DefaultBorderColor = "#DCDFE4"
+	FocusBorderColor   = "#98C379"
+)
+
 type GenerateBorderOption struct {
 	Title  []string
 	Footer []string
