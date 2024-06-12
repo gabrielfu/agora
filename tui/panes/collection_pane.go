@@ -21,9 +21,10 @@ type CollectionPaneModel struct {
 	table    table.Model
 	cursor   int
 	rctx     *states.RequestContext
+	dctx     *states.DialogContext
 }
 
-func NewCollectionPaneModel(rctx *states.RequestContext) CollectionPaneModel {
+func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) CollectionPaneModel {
 	s := table.DefaultStyles()
 	s.Selected = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFFFF")).
@@ -38,7 +39,7 @@ func NewCollectionPaneModel(rctx *states.RequestContext) CollectionPaneModel {
 		table.WithStyles(s),
 	)
 
-	return CollectionPaneModel{table: t, rctx: rctx}
+	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx}
 }
 
 func makeColumns(width int) []table.Column {

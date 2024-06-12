@@ -3,6 +3,7 @@ package panes
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/dialogs"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
 )
@@ -13,10 +14,11 @@ type UrlPaneModel struct {
 	borderColor string
 
 	rctx *states.RequestContext
+	dctx *states.DialogContext
 }
 
-func NewUrlPaneModel(rctx *states.RequestContext) UrlPaneModel {
-	return UrlPaneModel{rctx: rctx}
+func NewUrlPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) UrlPaneModel {
+	return UrlPaneModel{rctx: rctx, dctx: dctx}
 }
 
 func (m *UrlPaneModel) SetWidth(width int) {
@@ -45,6 +47,15 @@ func (m UrlPaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "m":
+			dialog := dialogs.NewSelectMethodDialog()
+			dialog.SetWidth(12)
+			m.dctx.SetDialog(dialog)
+		}
+	}
 	return m, nil
 }
 

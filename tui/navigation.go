@@ -42,17 +42,6 @@ func (m *NagivationModel) updateNagivationContent() {
 }
 
 func (m NagivationModel) Update(msg tea.Msg) (NagivationModel, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "k":
-			m.content = "Up"
-		case "j":
-			m.content = "Down"
-		default:
-			m.content = "Unknown"
-		}
-	}
 	return m, nil
 }
 

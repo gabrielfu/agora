@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/tipi/tui/dialogs"
 	"github.com/gabrielfu/tipi/tui/panes"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
@@ -18,12 +19,16 @@ const (
 	UrlPaneView
 	RequestPaneView
 	ResponsePaneView
-	// Modal views
-	// ...
+	// Dialog views
+	SelectMethodDialogView
 )
 
 func isPaneView(v View) bool {
 	return v <= ResponsePaneView
+}
+
+func isDialogView(v View) bool {
+	return v >= SelectMethodDialogView
 }
 
 // RootModel implements tea.RootModel interface
@@ -38,6 +43,7 @@ type RootModel struct {
 
 	focus View
 	rctx  *states.RequestContext
+	dctx  *states.DialogContext
 
 	width               int
 	height              int
@@ -58,15 +64,17 @@ type SetFocusMsg struct {
 
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 	rctx := states.NewRequestContext()
+	dctx := states.NewDialogContext()
 	m := &RootModel{
 		db:             db,
-		collectionPane: panes.NewCollectionPaneModel(rctx),
-		urlPane:        panes.NewUrlPaneModel(rctx),
+		collectionPane: panes.NewCollectionPaneModel(rctx, dctx),
+		urlPane:        panes.NewUrlPaneModel(rctx, dctx),
 		requestPane:    panes.NewRequestPaneModel(rctx),
 		responsePane:   panes.NewResponsePaneModel(rctx),
 		navigation:     NagivationModel{},
 		focus:          CollectionPaneView,
 		rctx:           rctx,
+		dctx:           dctx,
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -120,6 +128,15 @@ func (m *RootModel) updatePanes(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+func (m *RootModel) updateDialogFocus() {
+	if !m.dctx.Empty() {
+		switch m.dctx.Dialog().(type) {
+		case dialogs.SelectMethodDialog:
+			m.setFocus(SelectMethodDialogView)
+		}
+	}
+}
+
 func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
@@ -142,6 +159,13 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.setFocus(RequestPaneView)
 			case "4":
 				m.setFocus(ResponsePaneView)
+			}
+		}
+		if isDialogView(m.focus) {
+			switch msg.String() {
+			case "esc":
+				m.dctx.Clear()
+				m.setFocus(CollectionPaneView)
 			}
 		}
 		// update focused pane
@@ -186,14 +210,21 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	m.collectionPane.SetRequests(reqs)
 	m.responsePane.Refresh()
+	m.updateDialogFocus()
 
 	return m, tea.Batch(cmds...)
 }
 
 func (m RootModel) View() string {
-	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		lipgloss.JoinHorizontal(
+	var content string
+	if !m.dctx.Empty() {
+		content = lipgloss.Place(
+			m.width+2, m.height+3,
+			lipgloss.Center, lipgloss.Center,
+			m.dctx.View(),
+		)
+	} else {
+		content = lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			m.collectionPane.View(),
 			lipgloss.JoinVertical(
@@ -205,7 +236,11 @@ func (m RootModel) View() string {
 					m.responsePane.View(),
 				),
 			),
-		),
+		)
+	}
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		content,
 		m.navigation.View(),
 	)
 }
