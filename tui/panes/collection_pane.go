@@ -86,13 +86,13 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 	return m, nil
 }
 
-func (m CollectionPaneModel) renderTable() string {
+func (m CollectionPaneModel) renderTableWithoutHeader() string {
 	t := m.table.View()
 	ts := strings.SplitN(t, "\n", 2)
 	return ts[len(ts)-1]
 }
 
 func (m CollectionPaneModel) View() string {
-	t := m.renderTable()
+	t := m.renderTableWithoutHeader()
 	return m.generateStyle().Render(t)
 }
