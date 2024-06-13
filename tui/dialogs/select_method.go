@@ -98,7 +98,9 @@ func (m SelectMethodDialog) updateRequest() tea.Cmd {
 	}
 }
 
-func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
+func (m *SelectMethodDialog) SetWidth(width int) {}
+
+func (m *SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
@@ -113,6 +115,6 @@ func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	return m, cmd
 }
 
-func (m SelectMethodDialog) View() string {
+func (m *SelectMethodDialog) View() string {
 	return m.generateStyle().Render(m.list.View())
 }

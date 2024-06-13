@@ -111,9 +111,9 @@ func (m *RootModel) updatePanes(msg tea.Msg) tea.Cmd {
 func (m *RootModel) updateDialogFocus() {
 	if !m.dctx.Empty() {
 		switch m.dctx.Dialog().(type) {
-		case dialogs.SelectMethodDialog:
+		case *dialogs.SelectMethodDialog:
 			m.setFocus(views.SelectMethodDialogView)
-		case dialogs.TextInputDialog:
+		case *dialogs.TextInputDialog:
 			m.setFocus(views.TextInputDialogView)
 		}
 	}
@@ -189,6 +189,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		responsePaneWidth := urlPaneWidth - requestPaneWidth - 2
 		m.responsePane.SetWidth(responsePaneWidth)
 		m.responsePane.SetHeight(m.height - 3)
+
+		m.dctx.SetDialogWidth(m.width)
 
 		cmd = m.updatePanes(msg)
 		cmds = append(cmds, cmd)

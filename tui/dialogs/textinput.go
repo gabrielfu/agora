@@ -11,6 +11,7 @@ import (
 
 type TextInputDialog struct {
 	width            int
+	maxWidth         int
 	title            []string
 	footer           []string
 	submitCmdFactory func(string) tea.Cmd // func to generate a Cmd that submits the input value
@@ -18,11 +19,12 @@ type TextInputDialog struct {
 	textInput        textinput.Model
 }
 
-func NewTextInputDialog(width int, title, footer []string, submitCmdFactory func(string) tea.Cmd, exitView views.View) TextInputDialog {
+func NewTextInputDialog(maxWidth int, title, footer []string, submitCmdFactory func(string) tea.Cmd, exitView views.View) TextInputDialog {
 	t := textinput.New()
 	t.Prompt = ""
 	return TextInputDialog{
-		width:            width,
+		width:            maxWidth,
+		maxWidth:         maxWidth,
 		title:            title,
 		footer:           footer,
 		submitCmdFactory: submitCmdFactory,
@@ -58,7 +60,11 @@ func (m TextInputDialog) exit() tea.Cmd {
 	}
 }
 
-func (m TextInputDialog) Update(msg tea.Msg) (any, tea.Cmd) {
+func (m *TextInputDialog) SetWidth(windowWidth int) {
+	m.width = min(m.maxWidth, windowWidth-4)
+}
+
+func (m *TextInputDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -73,6 +79,6 @@ func (m TextInputDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	return m, tea.Batch(textinput.Blink, cmd)
 }
 
-func (m TextInputDialog) View() string {
+func (m *TextInputDialog) View() string {
 	return m.generateStyle().Render(m.textInput.View())
 }

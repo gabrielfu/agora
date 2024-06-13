@@ -5,6 +5,7 @@ import (
 )
 
 type Dialog interface {
+	SetWidth(int)
 	Update(tea.Msg) (any, tea.Cmd)
 	View() string
 }
@@ -26,6 +27,12 @@ func (d *DialogContext) View() string {
 		return ""
 	}
 	return d.dialog.View()
+}
+
+func (d *DialogContext) SetDialogWidth(width int) {
+	if d.dialog != nil {
+		d.dialog.SetWidth(width)
+	}
 }
 
 func (d *DialogContext) Dialog() Dialog {

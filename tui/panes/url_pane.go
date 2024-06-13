@@ -78,13 +78,13 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 		switch msg.String() {
 		case "m":
 			if !m.rctx.Empty() {
-				m.dctx.SetDialog(m.selectMethodDialog)
+				m.dctx.SetDialog(&m.selectMethodDialog)
 			}
 		case "u":
 			if !m.rctx.Empty() {
 				m.textInputDialog.SetValue(m.rctx.Request().URL)
 				m.textInputDialog.Focus()
-				m.dctx.SetDialog(m.textInputDialog)
+				m.dctx.SetDialog(&m.textInputDialog)
 			}
 		case "esc":
 			return m, func() tea.Msg { return messages.SetFocusMsg{View: views.CollectionPaneView} }
