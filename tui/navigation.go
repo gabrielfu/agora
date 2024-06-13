@@ -36,6 +36,7 @@ func (m *NagivationModel) updateNagivationContent() {
 	case views.CollectionPaneView:
 		keymap = CollectionPaneKeymap
 	case views.UrlPaneView:
+		keymap = UrlPaneKeymap
 	case views.RequestPaneView:
 	case views.ResponsePaneView:
 	case views.SelectMethodDialogView:

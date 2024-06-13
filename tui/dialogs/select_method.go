@@ -109,7 +109,7 @@ func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 		switch msg.String() {
 		case "esc":
 			return m, m.exit()
-		case "enter":
+		case " ", "enter":
 			return m, tea.Batch(m.exit(), m.updateRequest())
 		}
 	}
