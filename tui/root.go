@@ -137,7 +137,9 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
-			return m, tea.Quit
+			if m.dctx.Empty() {
+				return m, tea.Quit
+			}
 		}
 		// switch focus
 		if views.IsPaneView(m.focus) {
