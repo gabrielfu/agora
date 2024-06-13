@@ -78,7 +78,7 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 		switch msg.String() {
 		case "e":
 			if !m.rctx.Empty() {
-				return m, func() tea.Msg { return messages.ExecuteRequestMsg{} }
+				return m, messages.ExecuteRequestCmd
 			}
 		case "m":
 			if !m.rctx.Empty() {

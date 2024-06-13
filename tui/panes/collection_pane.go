@@ -135,7 +135,7 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "e":
-			return m, func() tea.Msg { return messages.ExecuteRequestMsg{} }
+			return m, messages.ExecuteRequestCmd
 		case "enter":
 			return m, func() tea.Msg { return messages.SetFocusMsg{View: views.UrlPaneView} }
 		}
