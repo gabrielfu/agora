@@ -76,6 +76,10 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "e":
+			if !m.rctx.Empty() {
+				return m, func() tea.Msg { return messages.ExecuteRequestMsg{} }
+			}
 		case "m":
 			if !m.rctx.Empty() {
 				m.dctx.SetDialog(&m.selectMethodDialog)

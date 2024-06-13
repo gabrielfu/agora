@@ -22,9 +22,9 @@ func init() {
 	// CollectionPaneKeymap.Set("n", "New")
 	// CollectionPaneKeymap.Set("d", "Delete")
 
+	UrlPaneKeymap.Set("e", "Execute")
 	UrlPaneKeymap.Set("m", "Select method")
 	UrlPaneKeymap.Set("u", "Edit url")
-	// UrlPaneKeymap.Set("e", "Execute")
 	UrlPaneKeymap.Set("<esc>", "Back")
 
 	SelectMethodDialogKeymap.Set("<enter>", "Select")
