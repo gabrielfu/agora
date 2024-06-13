@@ -13,17 +13,18 @@ var (
 )
 
 func init() {
-	CollectionPaneKeymap.Set("<space>", "Select")
+	// CollectionPaneKeymap.Set("<enter>", "Select")
 	CollectionPaneKeymap.Set("e", "Execute")
 	// CollectionPaneKeymap.Set("n", "New")
 	// CollectionPaneKeymap.Set("d", "Delete")
 
 	UrlPaneKeymap.Set("m", "Select method")
+	UrlPaneKeymap.Set("u", "Edit url")
 	// UrlPaneKeymap.Set("e", "Execute")
 
-	SelectMethodDialogKeymap.Set("<space>", "Select")
+	SelectMethodDialogKeymap.Set("<enter>", "Select")
 	SelectMethodDialogKeymap.Set("<esc>", "Cancel")
 
-	TextInputDialogKeymap.Set("<esc>", "Cancel")
 	TextInputDialogKeymap.Set("<enter>", "Submit")
+	TextInputDialogKeymap.Set("<esc>", "Cancel")
 }

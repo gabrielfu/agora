@@ -101,11 +101,11 @@ func (m SelectMethodDialog) updateRequest() tea.Cmd {
 func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "esc", "ctrl+c":
-			return m, m.exit()
-		case " ", "enter":
+		switch msg.Type {
+		case tea.KeyEnter:
 			return m, tea.Batch(m.exit(), m.updateRequest())
+		case tea.KeyCtrlC, tea.KeyEsc:
+			return m, m.exit()
 		}
 	}
 	var cmd tea.Cmd
