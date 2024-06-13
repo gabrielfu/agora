@@ -69,8 +69,8 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 	var rows []table.Row
 	for _, request := range requests {
 		// TODO: cell level color doesn't work yet for bubbles table
-		method := RenderMethod(request.Method)
-		u := RenderURL(request.URL)
+		method := styles.RenderMethod(request.Method)
+		u := styles.RenderURL(request.URL)
 		rows = append(rows, table.Row{method, u})
 	}
 	m.table.SetRows(rows)

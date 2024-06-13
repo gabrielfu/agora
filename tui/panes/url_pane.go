@@ -62,8 +62,8 @@ func (m UrlPaneModel) View() string {
 	var text string
 	if !m.rctx.Empty() {
 		request := m.rctx.Request()
-		method := RenderMethodWithColor(request.Method)
-		u := RenderURL(request.URL)
+		method := styles.RenderMethodWithColor(request.Method)
+		u := styles.RenderURL(request.URL)
 		text = method + " " + u
 	}
 	return m.generateStyle().Render(text)

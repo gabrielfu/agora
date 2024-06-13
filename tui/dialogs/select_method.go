@@ -12,23 +12,6 @@ import (
 	"github.com/gabrielfu/tipi/tui/views"
 )
 
-var methodColors = map[string]string{
-	"GET":     "#68D696",
-	"POST":    "#EED577",
-	"PUT":     "#74AEF6",
-	"PATCH":   "#C0A8E1",
-	"DELETE":  "#EF968A",
-	"HEAD":    "#68D696",
-	"OPTIONS": "#E55AA8",
-}
-
-func GetMethodColor(method string) string {
-	if color, ok := methodColors[method]; ok {
-		return color
-	}
-	return methodColors["GET"]
-}
-
 var (
 	itemStyle         = lipgloss.NewStyle()
 	selectedItemStyle = lipgloss.NewStyle().Background(lipgloss.Color(styles.SelectedBackgroundColor))
@@ -49,7 +32,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		return
 	}
 	method := fmt.Sprintf("%-8s", string(it))
-	color := GetMethodColor(string(it))
+	color := styles.GetMethodColor(string(it))
 	fn := itemStyle.Foreground(lipgloss.Color(color)).Render
 	if index == m.Index() {
 		fn = selectedItemStyle.Render

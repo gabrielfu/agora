@@ -1,4 +1,4 @@
-package panes
+package styles
 
 import (
 	"github.com/charmbracelet/lipgloss"
