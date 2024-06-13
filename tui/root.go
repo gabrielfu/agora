@@ -156,7 +156,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if !m.dctx.Empty() {
 			dialog, cmd := m.dctx.Dialog().Update(msg)
-			m.dctx.SetDialog(dialog.(states.Dialog))
+			m.dctx.SetDialog(dialog.(dialogs.Dialog))
 			cmds = append(cmds, cmd)
 		}
 		// update focused pane

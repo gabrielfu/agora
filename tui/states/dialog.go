@@ -1,17 +1,9 @@
 package states
 
-import (
-	tea "github.com/charmbracelet/bubbletea"
-)
-
-type Dialog interface {
-	SetWidth(int)
-	Update(tea.Msg) (any, tea.Cmd)
-	View() string
-}
+import "github.com/gabrielfu/tipi/tui/dialogs"
 
 type DialogContext struct {
-	dialog Dialog
+	dialog dialogs.Dialog
 }
 
 func NewDialogContext() *DialogContext {
@@ -35,11 +27,11 @@ func (d *DialogContext) SetDialogWidth(width int) {
 	}
 }
 
-func (d *DialogContext) Dialog() Dialog {
+func (d *DialogContext) Dialog() dialogs.Dialog {
 	return d.dialog
 }
 
-func (d *DialogContext) SetDialog(dialog Dialog) {
+func (d *DialogContext) SetDialog(dialog dialogs.Dialog) {
 	d.dialog = dialog
 }
 
