@@ -75,10 +75,12 @@ func (m *RootModel) setFocus(v views.View) {
 	m.urlPane.SetBorderColor(styles.DefaultBorderColor)
 	m.requestPane.SetBorderColor(styles.DefaultBorderColor)
 	m.responsePane.SetBorderColor(styles.DefaultBorderColor)
+	m.collectionPane.Blur()
 
 	switch v {
 	case views.CollectionPaneView:
 		m.collectionPane.SetBorderColor(styles.FocusBorderColor)
+		m.collectionPane.Focus()
 	case views.UrlPaneView:
 		m.urlPane.SetBorderColor(styles.FocusBorderColor)
 	case views.RequestPaneView:

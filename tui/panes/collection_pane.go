@@ -13,6 +13,30 @@ import (
 	"github.com/gabrielfu/tipi/tui/styles"
 )
 
+var (
+	tableSelectedStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFFFFF")).
+				Background(lipgloss.Color(styles.SelectedBackgroundColor)).
+				Bold(false)
+	tableBlurSelectedStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFFFFF")).
+				Bold(false)
+)
+
+func tableStyles() table.Styles {
+	s := table.DefaultStyles()
+	s.Selected = tableSelectedStyle
+	s.Cell = lipgloss.NewStyle()
+	return s
+}
+
+func tableBlurStyles() table.Styles {
+	s := table.DefaultStyles()
+	s.Selected = tableBlurSelectedStyle
+	s.Cell = lipgloss.NewStyle()
+	return s
+}
+
 type CollectionPaneModel struct {
 	width       int
 	height      int
@@ -26,18 +50,11 @@ type CollectionPaneModel struct {
 }
 
 func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) CollectionPaneModel {
-	s := table.DefaultStyles()
-	s.Selected = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FFFFFF")).
-		Background(lipgloss.Color(styles.SelectedBackgroundColor)).
-		Bold(false)
-	s.Cell = lipgloss.NewStyle()
-
 	t := table.New(
 		table.WithColumns(makeColumns(0)),
 		table.WithRows(make([]table.Row, 0)),
 		table.WithFocused(true),
-		table.WithStyles(s),
+		table.WithStyles(tableStyles()),
 	)
 
 	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx}
@@ -96,6 +113,14 @@ func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
+}
+
+func (m *CollectionPaneModel) Blur() {
+	m.table.SetStyles(tableBlurStyles())
+}
+
+func (m *CollectionPaneModel) Focus() {
+	m.table.SetStyles(tableStyles())
 }
 
 func (m CollectionPaneModel) renderTableWithoutHeader() string {
