@@ -84,6 +84,8 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 				m.textInputDialog.Focus()
 				m.dctx.SetDialog(m.textInputDialog)
 			}
+		case "esc":
+			return m, func() tea.Msg { return messages.SetFocusMsg{View: views.CollectionPaneView} }
 		}
 	}
 	return m, nil

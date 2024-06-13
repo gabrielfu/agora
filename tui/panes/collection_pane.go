@@ -11,6 +11,7 @@ import (
 	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/tipi/tui/views"
 )
 
 var (
@@ -135,6 +136,8 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 		switch msg.String() {
 		case "e":
 			return m, func() tea.Msg { return messages.ExecuteRequestMsg{} }
+		case "enter":
+			return m, func() tea.Msg { return messages.SetFocusMsg{View: views.UrlPaneView} }
 		}
 	}
 
