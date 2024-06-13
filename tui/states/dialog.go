@@ -2,11 +2,9 @@ package states
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gabrielfu/tipi/tui/views"
 )
 
 type Dialog interface {
-	Prev() views.View
 	Update(tea.Msg) (any, tea.Cmd)
 	View() string
 }

@@ -39,10 +39,6 @@ func (m SelectMethodDialog) generateStyle() lipgloss.Style {
 		Padding(0, 1)
 }
 
-func (m SelectMethodDialog) Prev() views.View {
-	return views.UrlPaneView
-}
-
 func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
