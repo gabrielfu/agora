@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
 	"github.com/gabrielfu/tipi/tui/dialogs"
+	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/panes"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
@@ -39,10 +40,6 @@ func WithCollectionPaneWidth(width float32) Options {
 	}
 }
 
-type SetFocusMsg struct {
-	View views.View
-}
-
 func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 	rctx := states.NewRequestContext()
 	dctx := states.NewDialogContext()
@@ -67,7 +64,7 @@ func (m RootModel) Init() tea.Cmd {
 	return tea.Batch(
 		textinput.Blink,
 		func() tea.Msg {
-			return SetFocusMsg{View: views.CollectionPaneView}
+			return messages.SetFocusMsg{View: views.CollectionPaneView}
 		},
 	)
 }
@@ -122,8 +119,11 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
-	case SetFocusMsg:
+	case messages.SetFocusMsg:
 		m.setFocus(msg.View)
+	case messages.ExitDialogMsg:
+		m.dctx.Clear()
+		m.setFocus(msg.Dest)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
@@ -142,18 +142,10 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.setFocus(views.ResponsePaneView)
 			}
 		}
-		if views.IsDialogView(m.focus) {
-			switch msg.String() {
-			case "esc":
-				prev := m.dctx.Dialog().Prev()
-				m.dctx.Clear()
-				m.setFocus(prev)
-			}
-			if !m.dctx.Empty() {
-				dialog, cmd := m.dctx.Dialog().Update(msg)
-				m.dctx.SetDialog(dialog.(states.Dialog))
-				cmds = append(cmds, cmd)
-			}
+		if !m.dctx.Empty() {
+			dialog, cmd := m.dctx.Dialog().Update(msg)
+			m.dctx.SetDialog(dialog.(states.Dialog))
+			cmds = append(cmds, cmd)
 		}
 		// update focused pane
 		switch m.focus {

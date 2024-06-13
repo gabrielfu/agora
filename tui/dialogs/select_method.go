@@ -3,6 +3,7 @@ package dialogs
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/styles"
 	"github.com/gabrielfu/tipi/tui/views"
 )
@@ -43,6 +44,16 @@ func (m SelectMethodDialog) Prev() views.View {
 }
 
 func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			cmd := func() tea.Msg {
+				return messages.ExitDialogMsg{Dest: views.UrlPaneView}
+			}
+			return m, cmd
+		}
+	}
 	return m, nil
 }
 
