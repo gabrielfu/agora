@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
 )
@@ -110,7 +111,7 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "e":
-			m.rctx.Exec()
+			return m, func() tea.Msg { return messages.ExecuteRequestMsg{} }
 		}
 	}
 

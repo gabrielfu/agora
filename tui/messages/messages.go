@@ -13,6 +13,8 @@ type ExitDialogMsg struct {
 	Dest views.View
 }
 
+type ExecuteRequestMsg struct{}
+
 type UpdateRequestMsg struct {
 	internal.Request
 }

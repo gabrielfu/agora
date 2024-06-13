@@ -124,6 +124,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.ExitDialogMsg:
 		m.dctx.Clear()
 		m.setFocus(msg.Dest)
+	case messages.ExecuteRequestMsg:
+		m.rctx.Exec()
 	case messages.UpdateRequestMsg:
 		m.db.UpdateRequest(msg.Request)
 	case tea.KeyMsg:
