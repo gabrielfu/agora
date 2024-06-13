@@ -52,9 +52,8 @@ var methods = []list.Item{
 }
 
 type SelectMethodDialog struct {
-	width   int
-	request internal.Request
-	list    list.Model
+	width int
+	list  list.Model
 }
 
 func NewSelectMethodDialog() SelectMethodDialog {
@@ -67,10 +66,6 @@ func NewSelectMethodDialog() SelectMethodDialog {
 	l.SetShowPagination(false)
 	l.SetShowFilter(false)
 	return SelectMethodDialog{list: l, width: width}
-}
-
-func (m *SelectMethodDialog) SetRequest(req internal.Request) {
-	m.request = req
 }
 
 func (m SelectMethodDialog) generateStyle() lipgloss.Style {
@@ -93,12 +88,12 @@ func (m SelectMethodDialog) exit() tea.Cmd {
 }
 
 func (m SelectMethodDialog) updateRequest() tea.Cmd {
-	method := m.list.SelectedItem().(item)
-	req := m.request.Copy()
-	req.Method = string(method)
+	method := string(m.list.SelectedItem().(item))
 	return func() tea.Msg {
 		return messages.UpdateRequestMsg{
-			Request: req,
+			Func: func(r *internal.Request) {
+				r.Method = method
+			},
 		}
 	}
 }

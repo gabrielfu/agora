@@ -16,5 +16,5 @@ type ExitDialogMsg struct {
 type ExecuteRequestMsg struct{}
 
 type UpdateRequestMsg struct {
-	internal.Request
+	Func func(*internal.Request)
 }

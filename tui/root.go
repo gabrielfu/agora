@@ -127,7 +127,9 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.ExecuteRequestMsg:
 		m.rctx.Exec()
 	case messages.UpdateRequestMsg:
-		m.db.UpdateRequest(msg.Request)
+		req := m.rctx.Request().Copy()
+		msg.Func(&req)
+		m.db.UpdateRequest(req)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":

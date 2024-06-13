@@ -53,7 +53,6 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 		switch msg.String() {
 		case "m":
 			if !m.rctx.Empty() {
-				m.selectMethodDialog.SetRequest(*m.rctx.Request())
 				m.dctx.SetDialog(m.selectMethodDialog)
 			}
 		}
