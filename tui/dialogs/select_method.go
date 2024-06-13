@@ -67,10 +67,6 @@ func NewSelectMethodDialog() SelectMethodDialog {
 	return SelectMethodDialog{list: l, width: width}
 }
 
-func (m *SelectMethodDialog) SetWidth(width int) {
-	m.width = width
-}
-
 func (m SelectMethodDialog) generateStyle() lipgloss.Style {
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
