@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/internal"
 	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/styles"
 	"github.com/gabrielfu/tipi/tui/views"
@@ -51,8 +52,9 @@ var methods = []list.Item{
 }
 
 type SelectMethodDialog struct {
-	width int
-	list  list.Model
+	width   int
+	request internal.Request
+	list    list.Model
 }
 
 func NewSelectMethodDialog() SelectMethodDialog {
@@ -65,6 +67,10 @@ func NewSelectMethodDialog() SelectMethodDialog {
 	l.SetShowPagination(false)
 	l.SetShowFilter(false)
 	return SelectMethodDialog{list: l, width: width}
+}
+
+func (m *SelectMethodDialog) SetRequest(req internal.Request) {
+	m.request = req
 }
 
 func (m SelectMethodDialog) generateStyle() lipgloss.Style {
@@ -80,15 +86,31 @@ func (m SelectMethodDialog) generateStyle() lipgloss.Style {
 		Padding(0, 1)
 }
 
+func (m SelectMethodDialog) exit() tea.Cmd {
+	return func() tea.Msg {
+		return messages.ExitDialogMsg{Dest: views.UrlPaneView}
+	}
+}
+
+func (m SelectMethodDialog) updateRequest() tea.Cmd {
+	method := m.list.SelectedItem().(item)
+	req := m.request.Copy()
+	req.Method = string(method)
+	return func() tea.Msg {
+		return messages.UpdateRequestMsg{
+			Request: req,
+		}
+	}
+}
+
 func (m SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			cmd := func() tea.Msg {
-				return messages.ExitDialogMsg{Dest: views.UrlPaneView}
-			}
-			return m, cmd
+			return m, m.exit()
+		case "enter":
+			return m, tea.Batch(m.exit(), m.updateRequest())
 		}
 	}
 	var cmd tea.Cmd

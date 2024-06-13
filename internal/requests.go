@@ -36,6 +36,19 @@ func randomID() string {
 	return uuid.New().String()
 }
 
+func (r Request) Copy() Request {
+	return Request{
+		id:      r.id,
+		Name:    r.Name,
+		Method:  r.Method,
+		URL:     r.URL,
+		Body:    r.Body,
+		Params:  r.Params,
+		Headers: r.Headers,
+		Auth:    r.Auth,
+	}
+}
+
 func (r *Request) WithName(name string) *Request {
 	r.Name = name
 	return r

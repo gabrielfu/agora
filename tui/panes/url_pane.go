@@ -52,7 +52,10 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "m":
-			m.dctx.SetDialog(m.selectMethodDialog)
+			if !m.rctx.Empty() {
+				m.selectMethodDialog.SetRequest(*m.rctx.Request())
+				m.dctx.SetDialog(m.selectMethodDialog)
+			}
 		}
 	}
 	return m, nil

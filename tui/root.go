@@ -124,6 +124,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.ExitDialogMsg:
 		m.dctx.Clear()
 		m.setFocus(msg.Dest)
+	case messages.UpdateRequestMsg:
+		m.db.UpdateRequest(msg.Request)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
