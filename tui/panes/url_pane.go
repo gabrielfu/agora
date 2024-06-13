@@ -11,6 +11,16 @@ import (
 	"github.com/gabrielfu/tipi/tui/views"
 )
 
+func updateUrlCmd(url string) tea.Cmd {
+	return func() tea.Msg {
+		return messages.UpdateRequestMsg{
+			Func: func(r *internal.Request) {
+				r.URL = url
+			},
+		}
+	}
+}
+
 type UrlPaneModel struct {
 	width       int
 	height      int
@@ -28,18 +38,10 @@ func NewUrlPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) Ur
 		dctx:               dctx,
 		selectMethodDialog: dialogs.NewSelectMethodDialog(),
 		textInputDialog: dialogs.NewTextInputDialog(
-			40,
+			64,
 			[]string{"URL"},
 			nil,
-			func(text string) tea.Cmd {
-				return func() tea.Msg {
-					return messages.UpdateRequestMsg{
-						Func: func(r *internal.Request) {
-							r.URL = text
-						},
-					}
-				}
-			},
+			updateUrlCmd,
 			views.UrlPaneView,
 		),
 	}
