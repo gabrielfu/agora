@@ -4,12 +4,16 @@ import "github.com/elliotchance/orderedmap/v2"
 
 type Keymap = orderedmap.OrderedMap[string, string]
 
+func NewKeymap() *Keymap {
+	return orderedmap.NewOrderedMap[string, string]()
+}
+
 var (
-	EmptyKeymap              *Keymap = orderedmap.NewOrderedMap[string, string]()
-	CollectionPaneKeymap     *Keymap = orderedmap.NewOrderedMap[string, string]()
-	UrlPaneKeymap            *Keymap = orderedmap.NewOrderedMap[string, string]()
-	SelectMethodDialogKeymap *Keymap = orderedmap.NewOrderedMap[string, string]()
-	TextInputDialogKeymap    *Keymap = orderedmap.NewOrderedMap[string, string]()
+	EmptyKeymap              = NewKeymap()
+	CollectionPaneKeymap     = NewKeymap()
+	UrlPaneKeymap            = NewKeymap()
+	SelectMethodDialogKeymap = NewKeymap()
+	TextInputDialogKeymap    = NewKeymap()
 )
 
 func init() {
