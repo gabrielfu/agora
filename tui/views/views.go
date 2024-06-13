@@ -10,6 +10,7 @@ const (
 	ResponsePaneView
 	// Dialog views
 	SelectMethodDialogView
+	TextInputDialogView
 )
 
 func IsPaneView(v View) bool {

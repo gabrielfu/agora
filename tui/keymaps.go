@@ -9,6 +9,7 @@ var (
 	CollectionPaneKeymap     *Keymap = orderedmap.NewOrderedMap[string, string]()
 	UrlPaneKeymap            *Keymap = orderedmap.NewOrderedMap[string, string]()
 	SelectMethodDialogKeymap *Keymap = orderedmap.NewOrderedMap[string, string]()
+	TextInputDialogKeymap    *Keymap = orderedmap.NewOrderedMap[string, string]()
 )
 
 func init() {
@@ -22,4 +23,7 @@ func init() {
 
 	SelectMethodDialogKeymap.Set("<space>", "Select")
 	SelectMethodDialogKeymap.Set("<esc>", "Cancel")
+
+	TextInputDialogKeymap.Set("<esc>", "Cancel")
+	TextInputDialogKeymap.Set("<enter>", "Submit")
 }

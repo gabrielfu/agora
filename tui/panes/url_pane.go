@@ -3,9 +3,12 @@ package panes
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/internal"
 	"github.com/gabrielfu/tipi/tui/dialogs"
+	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/tipi/tui/views"
 )
 
 type UrlPaneModel struct {
@@ -16,10 +19,30 @@ type UrlPaneModel struct {
 	rctx               *states.RequestContext
 	dctx               *states.DialogContext
 	selectMethodDialog dialogs.SelectMethodDialog
+	textInputDialog    dialogs.TextInputDialog
 }
 
 func NewUrlPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) UrlPaneModel {
-	return UrlPaneModel{rctx: rctx, dctx: dctx, selectMethodDialog: dialogs.NewSelectMethodDialog()}
+	return UrlPaneModel{
+		rctx:               rctx,
+		dctx:               dctx,
+		selectMethodDialog: dialogs.NewSelectMethodDialog(),
+		textInputDialog: dialogs.NewTextInputDialog(
+			40,
+			[]string{"URL"},
+			nil,
+			func(text string) tea.Cmd {
+				return func() tea.Msg {
+					return messages.UpdateRequestMsg{
+						Func: func(r *internal.Request) {
+							r.URL = text
+						},
+					}
+				}
+			},
+			views.UrlPaneView,
+		),
+	}
 }
 
 func (m *UrlPaneModel) SetWidth(width int) {
@@ -54,6 +77,12 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 		case "m":
 			if !m.rctx.Empty() {
 				m.dctx.SetDialog(m.selectMethodDialog)
+			}
+		case "u":
+			if !m.rctx.Empty() {
+				m.textInputDialog.SetValue(m.rctx.Request().URL)
+				m.textInputDialog.Focus()
+				m.dctx.SetDialog(m.textInputDialog)
 			}
 		}
 	}
