@@ -13,12 +13,13 @@ type UrlPaneModel struct {
 	height      int
 	borderColor string
 
-	rctx *states.RequestContext
-	dctx *states.DialogContext
+	rctx               *states.RequestContext
+	dctx               *states.DialogContext
+	selectMethodDialog dialogs.SelectMethodDialog
 }
 
 func NewUrlPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) UrlPaneModel {
-	return UrlPaneModel{rctx: rctx, dctx: dctx}
+	return UrlPaneModel{rctx: rctx, dctx: dctx, selectMethodDialog: dialogs.NewSelectMethodDialog()}
 }
 
 func (m *UrlPaneModel) SetWidth(width int) {
@@ -51,9 +52,7 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "m":
-			dialog := dialogs.NewSelectMethodDialog()
-			dialog.SetWidth(12)
-			m.dctx.SetDialog(dialog)
+			m.dctx.SetDialog(m.selectMethodDialog)
 		}
 	}
 	return m, nil

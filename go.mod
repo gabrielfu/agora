@@ -12,6 +12,11 @@ require (
 require github.com/elliotchance/orderedmap/v2 v2.2.0
 
 require (
+	github.com/muesli/reflow v0.3.0 // indirect
+	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f // indirect
+)
+
+require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/x/ansi v0.1.2

@@ -25,7 +25,7 @@ var methodShort = map[string]string{
 	"OPTIONS": "OPT  ",
 }
 
-func getMethodColor(method string) string {
+func GetMethodColor(method string) string {
 	if color, ok := methodColors[method]; ok {
 		return color
 	}
@@ -45,7 +45,7 @@ func RenderMethod(method string) string {
 }
 
 func RenderMethodWithColor(method string) string {
-	color := getMethodColor(method)
+	color := GetMethodColor(method)
 	short := getMethodShort(method)
 	return lipgloss.NewStyle().Inline(true).Foreground(lipgloss.Color(color)).Render(short)
 }

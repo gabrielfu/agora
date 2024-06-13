@@ -28,7 +28,7 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 	s := table.DefaultStyles()
 	s.Selected = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFFFF")).
-		Background(lipgloss.Color("#61AFEF")).
+		Background(lipgloss.Color(styles.SelectedBackgroundColor)).
 		Bold(false)
 	s.Cell = lipgloss.NewStyle()
 
