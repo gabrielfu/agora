@@ -18,9 +18,7 @@ var (
 				Foreground(lipgloss.Color("#FFFFFF")).
 				Background(lipgloss.Color(styles.SelectedBackgroundColor)).
 				Bold(false)
-	tableBlurSelectedStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("#FFFFFF")).
-				Bold(false)
+	tableBlurSelectedStyle = lipgloss.NewStyle().Bold(false)
 )
 
 func tableStyles() table.Styles {
