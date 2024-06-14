@@ -1,10 +1,13 @@
 package panes
 
 import (
+	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/tipi/tui/dialogs"
 	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
@@ -21,18 +24,39 @@ const (
 	bodyTab
 )
 
+func updateParamCmdFunc(key string) dialogs.TextInputCmdFunc {
+	return func(value string) tea.Cmd {
+		return messages.UpdateRequestCmd(func(r *internal.Request) {
+			r.Params[key] = value
+		})
+	}
+}
+
 type RequestPaneModel struct {
 	width       int
 	height      int
 	borderColor string
 
 	rctx *states.RequestContext
+	dctx *states.DialogContext
 
-	tab requestPaneTab
+	tab             requestPaneTab
+	editParamDialog dialogs.TextInputDialog
 }
 
-func NewRequestPaneModel(rctx *states.RequestContext) RequestPaneModel {
-	return RequestPaneModel{rctx: rctx, tab: paramsTab}
+func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) RequestPaneModel {
+	return RequestPaneModel{
+		rctx: rctx,
+		dctx: dctx,
+		tab:  paramsTab,
+		editParamDialog: dialogs.NewTextInputDialog(
+			64,
+			[]string{"Param"},
+			nil,
+			nil,
+			views.RequestPaneView,
+		),
+	}
 }
 
 func (m *RequestPaneModel) SetWidth(width int) {
@@ -50,7 +74,9 @@ func (m *RequestPaneModel) SetBorderColor(color string) {
 func (m RequestPaneModel) renderTabBar() string {
 	tabs := []string{"Params", "Headers", "Body"}
 	tabs[m.tab] = focusedStyle.Render(tabs[m.tab])
-	return strings.Join(tabs, " - ") + "\n" + strings.Repeat(lipgloss.RoundedBorder().Bottom, m.width) + "\n"
+	separator := strings.Repeat(lipgloss.RoundedBorder().Bottom, m.width)
+	separator = lipgloss.NewStyle().Foreground(lipgloss.Color(m.borderColor)).Render(separator)
+	return strings.Join(tabs, " - ") + "\n" + separator + "\n"
 }
 
 func (m *RequestPaneModel) switchTab(direction int) {
@@ -83,6 +109,14 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 			m.switchTab(-1)
 		case "]", "tab":
 			m.switchTab(1)
+
+		// test only
+		case "enter":
+			m.editParamDialog.SetCmdFunc(updateParamCmdFunc("k1"))
+			m.editParamDialog.SetPrompt(lipgloss.NewStyle().Foreground(lipgloss.Color(m.borderColor)).Render("k1" + "="))
+			m.editParamDialog.SetValue("v1")
+			m.editParamDialog.Focus()
+			m.dctx.SetDialog(&m.editParamDialog)
 		}
 	}
 	return m, nil
@@ -92,8 +126,14 @@ func (m RequestPaneModel) View() string {
 	var text string
 	text = m.renderTabBar()
 	if !m.rctx.Empty() {
-		request := m.rctx.Request()
-		text += request.String()
+		switch m.tab {
+		case paramsTab:
+			text += fmt.Sprintf("%v", m.rctx.Request().Params)
+		case headersTab:
+			text += fmt.Sprintf("%v", m.rctx.Request().Headers)
+		case bodyTab:
+			text += fmt.Sprintf("%v", m.rctx.Request().Body)
+		}
 	}
 	return m.generateStyle().Render(text)
 }

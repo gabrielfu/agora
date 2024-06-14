@@ -48,7 +48,7 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 		db:             db,
 		collectionPane: panes.NewCollectionPaneModel(rctx, dctx),
 		urlPane:        panes.NewUrlPaneModel(rctx, dctx),
-		requestPane:    panes.NewRequestPaneModel(rctx),
+		requestPane:    panes.NewRequestPaneModel(rctx, dctx),
 		responsePane:   panes.NewResponsePaneModel(rctx),
 		navigation:     NagivationModel{},
 		focus:          views.CollectionPaneView,
