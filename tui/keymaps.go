@@ -12,6 +12,8 @@ var (
 	EmptyKeymap              = NewKeymap()
 	CollectionPaneKeymap     = NewKeymap()
 	UrlPaneKeymap            = NewKeymap()
+	RequestPaneKeymap        = NewKeymap()
+	ResponsePaneKeymap       = NewKeymap()
 	SelectMethodDialogKeymap = NewKeymap()
 	TextInputDialogKeymap    = NewKeymap()
 )
@@ -26,6 +28,10 @@ func init() {
 	UrlPaneKeymap.Set("m", "Select method")
 	UrlPaneKeymap.Set("u", "Edit url")
 	UrlPaneKeymap.Set("<esc>", "Back")
+
+	RequestPaneKeymap.Set("<esc>", "Back")
+
+	ResponsePaneKeymap.Set("<esc>", "Back")
 
 	SelectMethodDialogKeymap.Set("<enter>", "Select")
 	SelectMethodDialogKeymap.Set("<esc>", "Cancel")

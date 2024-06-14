@@ -6,8 +6,10 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/tipi/tui/views"
 )
 
 type ResponsePaneModel struct {
@@ -80,6 +82,11 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			return m, messages.SetFocusCmd(views.CollectionPaneView)
+		}
 	case tea.WindowSizeMsg:
 		verticalMarginHeight := 8
 		if !m.ready {

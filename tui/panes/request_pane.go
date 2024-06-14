@@ -3,8 +3,10 @@ package panes
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/tipi/tui/views"
 )
 
 type RequestPaneModel struct {
@@ -45,6 +47,13 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "esc":
+			return m, messages.SetFocusCmd(views.CollectionPaneView)
+		}
+	}
 	return m, nil
 }
 
