@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/tipi/tui/dialogs"
 	"github.com/gabrielfu/tipi/tui/messages"
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
@@ -40,11 +41,12 @@ type CollectionPaneModel struct {
 	height      int
 	borderColor string
 
-	requests []internal.Request
-	table    table.Model
-	cursor   int
-	rctx     *states.RequestContext
-	dctx     *states.DialogContext
+	requests       []internal.Request
+	table          table.Model
+	cursor         int
+	rctx           *states.RequestContext
+	dctx           *states.DialogContext
+	editNameDialog dialogs.TextInputDialog
 }
 
 func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) CollectionPaneModel {
@@ -63,7 +65,15 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 		// }),
 	)
 
-	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx}
+	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx,
+		editNameDialog: dialogs.NewTextInputDialog(
+			64,
+			[]string{"Name"},
+			nil,
+			updateNameCmd,
+			views.CollectionPaneView,
+		),
+	}
 }
 
 func makeColumns(width int) []table.Column {
@@ -94,8 +104,13 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 	for _, request := range requests {
 		// TODO: cell level color doesn't work yet for bubbles table
 		method := styles.RenderMethod(request.Method)
-		u := styles.RenderURL(request.URL)
-		rows = append(rows, table.Row{method, u})
+		var display string
+		if request.Name != "" {
+			display = request.Name
+		} else {
+			display = styles.RenderURL(request.URL)
+		}
+		rows = append(rows, table.Row{method, display})
 	}
 	m.table.SetRows(rows)
 	m.Update(nil)
@@ -145,6 +160,12 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 			return m, messages.ExecuteRequestCmd
 		case "enter":
 			return m, messages.SetFocusCmd(views.UrlPaneView)
+		case "r":
+			if !m.rctx.Empty() {
+				m.editNameDialog.SetValue(m.rctx.Request().Name)
+				m.editNameDialog.Focus()
+				m.dctx.SetDialog(&m.editNameDialog)
+			}
 		}
 	}
 
