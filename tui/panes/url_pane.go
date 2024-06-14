@@ -17,6 +17,12 @@ func updateUrlCmd(url string) tea.Cmd {
 	})
 }
 
+func updateNameCmd(name string) tea.Cmd {
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.Name = name
+	})
+}
+
 type UrlPaneModel struct {
 	width       int
 	height      int
@@ -25,7 +31,8 @@ type UrlPaneModel struct {
 	rctx               *states.RequestContext
 	dctx               *states.DialogContext
 	selectMethodDialog dialogs.SelectMethodDialog
-	textInputDialog    dialogs.TextInputDialog
+	editUrlDialog      dialogs.TextInputDialog
+	editNameDialog     dialogs.TextInputDialog
 }
 
 func NewUrlPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) UrlPaneModel {
@@ -33,11 +40,18 @@ func NewUrlPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) Ur
 		rctx:               rctx,
 		dctx:               dctx,
 		selectMethodDialog: dialogs.NewSelectMethodDialog(),
-		textInputDialog: dialogs.NewTextInputDialog(
+		editUrlDialog: dialogs.NewTextInputDialog(
 			64,
 			[]string{"URL"},
 			nil,
 			updateUrlCmd,
+			views.UrlPaneView,
+		),
+		editNameDialog: dialogs.NewTextInputDialog(
+			64,
+			[]string{"Name"},
+			nil,
+			updateNameCmd,
 			views.UrlPaneView,
 		),
 	}
@@ -56,9 +70,13 @@ func (m *UrlPaneModel) SetBorderColor(color string) {
 }
 
 func (m UrlPaneModel) generateStyle() lipgloss.Style {
+	title := []string{"[2]", "URL"}
+	if !m.rctx.Empty() {
+		title = append(title, "", "", "("+m.rctx.Request().Name+")")
+	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		styles.GenerateBorderOption{Title: []string{"[2]", "URL"}},
+		styles.GenerateBorderOption{Title: title},
 		m.width,
 	)
 	return lipgloss.NewStyle().
@@ -82,9 +100,15 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 			}
 		case "u":
 			if !m.rctx.Empty() {
-				m.textInputDialog.SetValue(m.rctx.Request().URL)
-				m.textInputDialog.Focus()
-				m.dctx.SetDialog(&m.textInputDialog)
+				m.editUrlDialog.SetValue(m.rctx.Request().URL)
+				m.editUrlDialog.Focus()
+				m.dctx.SetDialog(&m.editUrlDialog)
+			}
+		case "r":
+			if !m.rctx.Empty() {
+				m.editNameDialog.SetValue(m.rctx.Request().Name)
+				m.editNameDialog.Focus()
+				m.dctx.SetDialog(&m.editNameDialog)
 			}
 		case "esc":
 			return m, messages.SetFocusCmd(views.CollectionPaneView)
