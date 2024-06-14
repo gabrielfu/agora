@@ -30,6 +30,7 @@ type RootModel struct {
 	width               int
 	height              int
 	collectionPaneWidth float32
+	enoughSpace         bool
 }
 
 type Options func(*RootModel)
@@ -53,6 +54,7 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 		focus:          views.CollectionPaneView,
 		rctx:           rctx,
 		dctx:           dctx,
+		enoughSpace:    true,
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -173,6 +175,11 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width - 2
 		m.height = msg.Height - 3
 
+		m.enoughSpace = false
+		if m.width >= 78 && m.height >= 8 {
+			m.enoughSpace = true
+		}
+
 		collectionPaneWidth := int(float32(m.width) * m.collectionPaneWidth)
 		m.collectionPane.SetWidth(collectionPaneWidth)
 		m.collectionPane.SetHeight(m.height)
@@ -207,6 +214,15 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m RootModel) View() string {
+	if !m.enoughSpace {
+		return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(
+			lipgloss.Place(
+				m.width, m.height,
+				lipgloss.Center, lipgloss.Center,
+				"Not enough space to render panels",
+			),
+		)
+	}
 	var content string
 	if !m.dctx.Empty() {
 		content = lipgloss.Place(
