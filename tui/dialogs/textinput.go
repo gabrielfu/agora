@@ -55,9 +55,7 @@ func (m TextInputDialog) generateStyle() lipgloss.Style {
 }
 
 func (m TextInputDialog) exit() tea.Cmd {
-	return func() tea.Msg {
-		return messages.ExitDialogMsg{Dest: m.exitView}
-	}
+	return messages.ExitDialogCmd(m.exitView)
 }
 
 func (m *TextInputDialog) SetWidth(windowWidth int) {

@@ -82,20 +82,14 @@ func (m SelectMethodDialog) generateStyle() lipgloss.Style {
 }
 
 func (m SelectMethodDialog) exit() tea.Cmd {
-	return func() tea.Msg {
-		return messages.ExitDialogMsg{Dest: views.UrlPaneView}
-	}
+	return messages.ExitDialogCmd(views.UrlPaneView)
 }
 
 func (m SelectMethodDialog) updateRequest() tea.Cmd {
 	method := string(m.list.SelectedItem().(item))
-	return func() tea.Msg {
-		return messages.UpdateRequestMsg{
-			Func: func(r *internal.Request) {
-				r.Method = method
-			},
-		}
-	}
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.Method = method
+	})
 }
 
 func (m *SelectMethodDialog) SetWidth(width int) {}

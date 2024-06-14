@@ -63,9 +63,7 @@ func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
 func (m RootModel) Init() tea.Cmd {
 	return tea.Batch(
 		textinput.Blink,
-		func() tea.Msg {
-			return messages.SetFocusMsg{View: views.CollectionPaneView}
-		},
+		messages.SetFocusCmd(views.CollectionPaneView),
 	)
 }
 

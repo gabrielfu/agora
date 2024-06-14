@@ -12,13 +12,9 @@ import (
 )
 
 func updateUrlCmd(url string) tea.Cmd {
-	return func() tea.Msg {
-		return messages.UpdateRequestMsg{
-			Func: func(r *internal.Request) {
-				r.URL = url
-			},
-		}
-	}
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.URL = url
+	})
 }
 
 type UrlPaneModel struct {
@@ -91,7 +87,7 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 				m.dctx.SetDialog(&m.textInputDialog)
 			}
 		case "esc":
-			return m, func() tea.Msg { return messages.SetFocusMsg{View: views.CollectionPaneView} }
+			return m, messages.SetFocusCmd(views.CollectionPaneView)
 		}
 	}
 	return m, nil
