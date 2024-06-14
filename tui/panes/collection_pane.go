@@ -17,9 +17,8 @@ import (
 var (
 	tableSelectedStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("#FFFFFF")).
-				Background(lipgloss.Color(styles.SelectedBackgroundColor)).
-				Bold(false)
-	tableBlurSelectedStyle = lipgloss.NewStyle().Bold(false)
+				Background(lipgloss.Color(styles.SelectedBackgroundColor))
+	tableBlurSelectedStyle = lipgloss.NewStyle()
 )
 
 func tableStyles() table.Styles {
@@ -54,6 +53,14 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 		table.WithRows(make([]table.Row, 0)),
 		table.WithFocused(true),
 		table.WithStyles(tableStyles()),
+		// // Wait until StyleFunc is supported on bubbles/table
+		// table.WithStyleFunc(func(row, col int, value string) lipgloss.Style {
+		// 	if col == 0 { // is method column
+		// 		color := styles.GetMethodColor(value)
+		// 		return lipgloss.NewStyle().Foreground(lipgloss.Color(color))
+		// 	}
+		// 	return lipgloss.NewStyle()
+		// }),
 	)
 
 	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx}

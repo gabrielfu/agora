@@ -13,6 +13,13 @@ var methodColors = map[string]string{
 	"DELETE":  "#EF968A",
 	"HEAD":    "#68D696",
 	"OPTIONS": "#E55AA8",
+	// short form
+	"GET  ": "#68D696",
+	"POST ": "#EED577",
+	"PUT  ": "#74AEF6",
+	"DEL  ": "#EF968A",
+	"HEAD ": "#68D696",
+	"OPT  ": "#E55AA8",
 }
 
 var methodShort = map[string]string{
