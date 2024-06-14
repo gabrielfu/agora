@@ -7,16 +7,26 @@ import (
 	"strings"
 
 	"github.com/gabrielfu/tipi/internal"
+	"github.com/google/uuid"
 )
 
 type RequestContext struct {
-	req  *internal.Request
-	resp *internal.Response
-	err  error
+	req         *internal.Request
+	resp        *internal.Response
+	err         error
+	fingerprint string // not a real fingerprint, just a string to identify the state
 }
 
 func NewRequestContext() *RequestContext {
 	return &RequestContext{}
+}
+
+func (c *RequestContext) Fingerprint() string {
+	return c.fingerprint
+}
+
+func (c *RequestContext) newFingerprint() {
+	c.fingerprint = uuid.New().String()
 }
 
 func (c *RequestContext) Empty() bool {
@@ -29,6 +39,7 @@ func (c *RequestContext) Request() *internal.Request {
 
 func (c *RequestContext) SetRequest(req *internal.Request) {
 	c.req = req
+	c.newFingerprint()
 }
 
 func (c *RequestContext) Response() *internal.Response {
@@ -37,6 +48,7 @@ func (c *RequestContext) Response() *internal.Response {
 
 func (c *RequestContext) SetResponse(resp *internal.Response) {
 	c.resp = resp
+	c.newFingerprint()
 }
 
 func (c *RequestContext) Error() error {
@@ -45,16 +57,20 @@ func (c *RequestContext) Error() error {
 
 func (c *RequestContext) SetError(err error) {
 	c.err = err
+	c.newFingerprint()
 }
 
 func (c *RequestContext) Clear() {
 	c.req = nil
 	c.resp = nil
 	c.err = nil
+	c.fingerprint = ""
 }
 
 func (c *RequestContext) Exec() {
 	response, err := c.req.Exec()
+	defer c.newFingerprint()
+
 	c.err = err
 	if err != nil {
 		fmt.Println("Error:", err)

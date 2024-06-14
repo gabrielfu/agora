@@ -15,10 +15,10 @@ type ResponsePaneModel struct {
 	height      int
 	borderColor string
 
-	rctx     *states.RequestContext
-	ready    bool
-	state    string // state is the current error or response state
-	viewport viewport.Model
+	rctx        *states.RequestContext
+	ready       bool
+	fingerprint string
+	viewport    viewport.Model
 }
 
 func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
@@ -60,24 +60,15 @@ func (m *ResponsePaneModel) Refresh() {
 		return
 	}
 
-	var text string
-	refresh := false
-	err := m.rctx.Error()
-	response := m.rctx.Response()
-	if err != nil {
-		text = err.Error()
-		if text != m.state {
-			m.state = text
-			refresh = true
+	if m.fingerprint != m.rctx.Fingerprint() {
+		m.fingerprint = m.rctx.Fingerprint()
+
+		var text string
+		if err := m.rctx.Error(); err != nil {
+			text = err.Error()
+		} else if m.rctx.Response() != nil {
+			text = m.rctx.Response().String()
 		}
-	} else if response != nil {
-		text = response.String()
-		if response.ID() != m.state {
-			m.state = response.ID()
-			refresh = true
-		}
-	}
-	if refresh {
 		m.viewport.SetContent(text)
 	}
 }
