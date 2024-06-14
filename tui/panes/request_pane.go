@@ -113,7 +113,7 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 		// test only
 		case "enter":
 			m.editParamDialog.SetCmdFunc(updateParamCmdFunc("k1"))
-			m.editParamDialog.SetPrompt(lipgloss.NewStyle().Foreground(lipgloss.Color(m.borderColor)).Render("k1" + "="))
+			m.editParamDialog.SetPrompt(focusedStyle.Render("k1" + "="))
 			m.editParamDialog.SetValue("v1")
 			m.editParamDialog.Focus()
 			m.dctx.SetDialog(&m.editParamDialog)
