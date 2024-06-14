@@ -9,28 +9,34 @@ import (
 	"github.com/gabrielfu/tipi/tui/views"
 )
 
+type TextInputCmdFunc func(string) tea.Cmd
+
 type TextInputDialog struct {
-	width            int
-	maxWidth         int
-	title            []string
-	footer           []string
-	submitCmdFactory func(string) tea.Cmd // func to generate a Cmd that submits the input value
-	exitView         views.View
-	textInput        textinput.Model
+	width         int
+	maxWidth      int
+	title         []string
+	footer        []string
+	submitCmdFunc TextInputCmdFunc // func to generate a Cmd that submits the input value
+	exitView      views.View
+	textInput     textinput.Model
 }
 
-func NewTextInputDialog(maxWidth int, title, footer []string, submitCmdFactory func(string) tea.Cmd, exitView views.View) TextInputDialog {
+func NewTextInputDialog(maxWidth int, title, footer []string, submitCmdFunc TextInputCmdFunc, exitView views.View) TextInputDialog {
 	t := textinput.New()
 	t.Prompt = ""
 	return TextInputDialog{
-		width:            maxWidth,
-		maxWidth:         maxWidth,
-		title:            title,
-		footer:           footer,
-		submitCmdFactory: submitCmdFactory,
-		exitView:         exitView,
-		textInput:        t,
+		width:         maxWidth,
+		maxWidth:      maxWidth,
+		title:         title,
+		footer:        footer,
+		submitCmdFunc: submitCmdFunc,
+		exitView:      exitView,
+		textInput:     t,
 	}
+}
+
+func (m *TextInputDialog) SetPrompt(prompt string) {
+	m.textInput.Prompt = prompt
 }
 
 func (m *TextInputDialog) SetValue(value string) {
@@ -62,13 +68,17 @@ func (m *TextInputDialog) SetWidth(windowWidth int) {
 	m.width = min(m.maxWidth, windowWidth-4)
 }
 
+func (m *TextInputDialog) SetCmdFunc(cmdFunc TextInputCmdFunc) {
+	m.submitCmdFunc = cmdFunc
+}
+
 func (m *TextInputDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEnter:
-			return m, tea.Batch(m.exit(), m.submitCmdFactory(m.textInput.Value()))
+			return m, tea.Batch(m.exit(), m.submitCmdFunc(m.textInput.Value()))
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, m.exit()
 		}
