@@ -135,6 +135,9 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		msg.Func(&req)
 		m.db.UpdateRequest(req)
 	case tea.KeyMsg:
+		if !m.enoughSpace {
+			break
+		}
 		switch msg.String() {
 		case "ctrl+c", "q":
 			if m.dctx.Empty() {
