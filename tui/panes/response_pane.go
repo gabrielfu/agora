@@ -56,6 +56,7 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 
 func (m *ResponsePaneModel) Refresh() {
 	if m.rctx.Empty() {
+		m.fingerprint = ""
 		m.viewport.SetContent("")
 		return
 	}
