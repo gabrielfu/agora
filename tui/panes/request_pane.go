@@ -34,13 +34,13 @@ func updateParamCmdFunc(key string) dialogs.TextInputCmdFunc {
 	}
 }
 
-type defaultItem struct {
+type kvItem struct {
 	key, value string
 }
 
-func (i defaultItem) Title() string       { return i.key }
-func (i defaultItem) Description() string { return i.value }
-func (i defaultItem) FilterValue() string { return i.key }
+func (i kvItem) Title() string       { return i.key }
+func (i kvItem) Description() string { return i.value }
+func (i kvItem) FilterValue() string { return i.key }
 
 type RequestPaneModel struct {
 	width       int
@@ -119,7 +119,7 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m *RequestPaneModel) handleUpdateParam() {
-	item, ok := m.list.SelectedItem().(defaultItem)
+	item, ok := m.list.SelectedItem().(kvItem)
 	if !ok {
 		return
 	}
@@ -138,13 +138,13 @@ func (m *RequestPaneModel) Refresh() {
 		case paramsTab:
 			var items []list.Item
 			for k, v := range m.rctx.Request().Params {
-				items = append(items, defaultItem{key: k, value: v})
+				items = append(items, kvItem{key: k, value: v})
 			}
 			m.list.SetItems(items)
 		case headersTab:
 			var items []list.Item
 			for k, v := range m.rctx.Request().Headers {
-				items = append(items, defaultItem{key: k, value: v})
+				items = append(items, kvItem{key: k, value: v})
 			}
 			m.list.SetItems(items)
 		default:
