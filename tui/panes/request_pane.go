@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/tipi/internal"
@@ -24,6 +25,7 @@ const (
 	bodyTab
 )
 
+// fix support for multiple params with same key
 func updateParamCmdFunc(key string) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
@@ -31,6 +33,14 @@ func updateParamCmdFunc(key string) dialogs.TextInputCmdFunc {
 		})
 	}
 }
+
+type defaultItem struct {
+	key, value string
+}
+
+func (i defaultItem) Title() string       { return i.key }
+func (i defaultItem) Description() string { return i.value }
+func (i defaultItem) FilterValue() string { return i.key }
 
 type RequestPaneModel struct {
 	width       int
@@ -42,9 +52,17 @@ type RequestPaneModel struct {
 
 	tab             requestPaneTab
 	editParamDialog dialogs.TextInputDialog
+	list            list.Model
 }
 
 func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) RequestPaneModel {
+	l := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
+	l.SetShowTitle(false)
+	l.SetShowStatusBar(false)
+	l.SetFilteringEnabled(false)
+	l.SetShowHelp(false)
+	// l.SetShowPagination(false)
+	l.SetShowFilter(false)
 	return RequestPaneModel{
 		rctx: rctx,
 		dctx: dctx,
@@ -56,6 +74,7 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 			nil,
 			views.RequestPaneView,
 		),
+		list: l,
 	}
 }
 
@@ -99,6 +118,41 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 		Height(m.height)
 }
 
+func (m *RequestPaneModel) handleUpdateParam() {
+	item, ok := m.list.SelectedItem().(defaultItem)
+	if !ok {
+		return
+	}
+	key, value := item.key, item.value
+	m.editParamDialog.SetCmdFunc(updateParamCmdFunc(key))
+	m.editParamDialog.SetPrompt(focusedStyle.Render(key + "="))
+	m.editParamDialog.SetValue(value)
+	m.editParamDialog.Focus()
+	m.dctx.SetDialog(&m.editParamDialog)
+}
+
+func (m *RequestPaneModel) Refresh() {
+	// refresh param list
+	if !m.rctx.Empty() {
+		switch m.tab {
+		case paramsTab:
+			var items []list.Item
+			for k, v := range m.rctx.Request().Params {
+				items = append(items, defaultItem{key: k, value: v})
+			}
+			m.list.SetItems(items)
+		case headersTab:
+			var items []list.Item
+			for k, v := range m.rctx.Request().Headers {
+				items = append(items, defaultItem{key: k, value: v})
+			}
+			m.list.SetItems(items)
+		default:
+			m.list.SetItems([]list.Item{})
+		}
+	}
+}
+
 func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -109,17 +163,18 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 			m.switchTab(-1)
 		case "]", "tab":
 			m.switchTab(1)
-
-		// test only
 		case "enter":
-			m.editParamDialog.SetCmdFunc(updateParamCmdFunc("k1"))
-			m.editParamDialog.SetPrompt(focusedStyle.Render("k1" + "="))
-			m.editParamDialog.SetValue("v1")
-			m.editParamDialog.Focus()
-			m.dctx.SetDialog(&m.editParamDialog)
+			switch m.tab {
+			case paramsTab:
+				m.handleUpdateParam()
+			}
 		}
+	case tea.WindowSizeMsg:
+		m.list.SetSize(m.width-2, m.height-3)
 	}
-	return m, nil
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
 }
 
 func (m RequestPaneModel) View() string {
@@ -127,10 +182,8 @@ func (m RequestPaneModel) View() string {
 	text = m.renderTabBar()
 	if !m.rctx.Empty() {
 		switch m.tab {
-		case paramsTab:
-			text += fmt.Sprintf("%v", m.rctx.Request().Params)
-		case headersTab:
-			text += fmt.Sprintf("%v", m.rctx.Request().Headers)
+		case paramsTab, headersTab:
+			text += m.list.View()
 		case bodyTab:
 			text += fmt.Sprintf("%v", m.rctx.Request().Body)
 		}

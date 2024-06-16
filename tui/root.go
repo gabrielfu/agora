@@ -210,6 +210,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 	m.collectionPane.SetRequests(reqs)
+	m.requestPane.Refresh()
 	m.responsePane.Refresh()
 	m.updateDialogFocus()
 
