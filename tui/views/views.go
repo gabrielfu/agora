@@ -11,6 +11,7 @@ const (
 	// Dialog views
 	SelectMethodDialogView
 	TextInputDialogView
+	TextAreaDialogView
 )
 
 func IsPaneView(v View) bool {

@@ -115,6 +115,8 @@ func (m *RootModel) updateDialogFocus() {
 			m.setFocus(views.SelectMethodDialogView)
 		case *dialogs.TextInputDialog, *dialogs.DoubleTextInputDialog:
 			m.setFocus(views.TextInputDialogView)
+		case *dialogs.TextAreaDialog:
+			m.setFocus(views.TextAreaDialogView)
 		}
 	}
 }

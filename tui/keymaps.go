@@ -16,6 +16,7 @@ var (
 	ResponsePaneKeymap       = NewKeymap()
 	SelectMethodDialogKeymap = NewKeymap()
 	TextInputDialogKeymap    = NewKeymap()
+	TextAreaDialogKeymap     = NewKeymap()
 )
 
 func init() {
@@ -43,4 +44,8 @@ func init() {
 
 	TextInputDialogKeymap.Set("<enter>", "Submit")
 	TextInputDialogKeymap.Set("<esc>", "Cancel")
+
+	TextAreaDialogKeymap.Set("<ctrl+w>", "Submit")
+	TextAreaDialogKeymap.Set("<esc>", "Cancel")
+	TextAreaDialogKeymap.Set("<enter>", "New line")
 }

@@ -45,6 +45,8 @@ func (m *NagivationModel) updateNagivationContent() {
 		keymap = SelectMethodDialogKeymap
 	case views.TextInputDialogView:
 		keymap = TextInputDialogKeymap
+	case views.TextAreaDialogView:
+		keymap = TextAreaDialogKeymap
 	}
 	m.content = m.renderKeymap(keymap)
 }

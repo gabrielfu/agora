@@ -49,6 +49,12 @@ func updateHeaderCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
 	}
 }
 
+var updateBodyCmdFunc dialogs.TextAreaCmdFunc = func(body string) tea.Cmd {
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.Body = body
+	})
+}
+
 var newHeaderCmdFunc dialogs.DoubleTextInputCmdFunc = func(key, value string) tea.Cmd {
 	return messages.UpdateRequestCmd(func(r *internal.Request) {
 		r.WithHeader(key, value)
@@ -74,6 +80,7 @@ type RequestPaneModel struct {
 	tab                   requestPaneTab
 	textInputDialog       dialogs.TextInputDialog
 	doubleTextInputDialog dialogs.DoubleTextInputDialog
+	textAreaDialog        dialogs.TextAreaDialog
 	list                  list.Model
 }
 
@@ -101,6 +108,14 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 			[]string{"Key"},
 			nil,
 			[]string{"Value"},
+			nil,
+			nil,
+			views.RequestPaneView,
+		),
+		textAreaDialog: dialogs.NewTextAreaDialog(
+			64,
+			20,
+			[]string{"Body"},
 			nil,
 			nil,
 			views.RequestPaneView,
@@ -209,6 +224,18 @@ func (m *RequestPaneModel) handleDeleteHeader() tea.Cmd {
 	})
 }
 
+func (m *RequestPaneModel) handleUpdateBody() {
+	if m.rctx.Empty() {
+		return
+	}
+	request := m.rctx.Request()
+	body := request.Body.(string)
+	m.textAreaDialog.SetCmdFunc(updateBodyCmdFunc)
+	m.textAreaDialog.SetValue(body)
+	m.textAreaDialog.Focus()
+	m.dctx.SetDialog(&m.textAreaDialog)
+}
+
 // Refresh refreshes the list items based on the current tab.
 func (m *RequestPaneModel) Refresh() {
 	items := make([]list.Item, 0)
@@ -250,6 +277,8 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 					m.handleUpdateParam()
 				case headersTab:
 					m.handleUpdateHeader()
+				case bodyTab:
+					m.handleUpdateBody()
 				}
 			case "n":
 				switch m.tab {
