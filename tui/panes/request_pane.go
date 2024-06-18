@@ -209,25 +209,26 @@ func (m *RequestPaneModel) handleDeleteHeader() tea.Cmd {
 	})
 }
 
+// Refresh refreshes the list items based on the current tab.
 func (m *RequestPaneModel) Refresh() {
-	// refresh param list
-	if !m.rctx.Empty() {
-		switch m.tab {
-		case paramsTab:
-			var items []list.Item
-			for _, kv := range m.rctx.Request().Params {
-				items = append(items, kvItem{key: kv.Key, value: kv.Value})
-			}
-			m.list.SetItems(items)
-		case headersTab:
-			var items []list.Item
-			for _, kv := range m.rctx.Request().Headers {
-				items = append(items, kvItem{key: kv.Key, value: kv.Value})
-			}
-			m.list.SetItems(items)
-		default:
-			m.list.SetItems([]list.Item{})
+	if m.rctx.Empty() {
+		return
+	}
+	switch m.tab {
+	case paramsTab:
+		var items []list.Item
+		for _, kv := range m.rctx.Request().Params {
+			items = append(items, kvItem{key: kv.Key, value: kv.Value})
 		}
+		m.list.SetItems(items)
+	case headersTab:
+		var items []list.Item
+		for _, kv := range m.rctx.Request().Headers {
+			items = append(items, kvItem{key: kv.Key, value: kv.Value})
+		}
+		m.list.SetItems(items)
+	default:
+		m.list.SetItems([]list.Item{})
 	}
 }
 
