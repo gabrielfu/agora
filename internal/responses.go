@@ -9,7 +9,7 @@ type Response struct {
 
 func NewResponse(statusCode int, content []byte, headers map[string]string) *Response {
 	return &Response{
-		id:         randomID(),
+		id:         RandomID(),
 		StatusCode: statusCode,
 		Content:    content,
 		Headers:    headers,

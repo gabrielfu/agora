@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"sort"
-
-	"github.com/google/uuid"
 )
 
 type KVPair struct {
@@ -60,14 +58,10 @@ type Request struct {
 // NewRequest creates a new request with a random id.
 func NewRequest(method, url string) *Request {
 	return &Request{
-		id:     randomID(),
+		id:     RandomID(),
 		Method: method,
 		URL:    url,
 	}
-}
-
-func randomID() string {
-	return uuid.New().String()
 }
 
 func (r Request) Copy() Request {

@@ -9,7 +9,10 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22
 )
 
-require github.com/elliotchance/orderedmap/v2 v2.2.0
+require (
+	github.com/elliotchance/orderedmap/v2 v2.2.0
+	github.com/matoous/go-nanoid/v2 v2.1.0
+)
 
 require (
 	github.com/muesli/reflow v0.3.0 // indirect
@@ -24,7 +27,6 @@ require (
 	github.com/charmbracelet/x/term v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.1.2 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
-	github.com/google/uuid v1.6.0
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect

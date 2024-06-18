@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/gabrielfu/tipi/internal"
-	"github.com/google/uuid"
 )
 
 type RequestContext struct {
@@ -26,7 +25,7 @@ func (c *RequestContext) Fingerprint() string {
 }
 
 func (c *RequestContext) newFingerprint() {
-	c.fingerprint = uuid.New().String()
+	c.fingerprint = internal.RandomID()
 }
 
 func (c *RequestContext) Empty() bool {
