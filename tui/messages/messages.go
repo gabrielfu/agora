@@ -22,3 +22,7 @@ type UpdateRequestMsg struct {
 type CreateRequestMsg struct {
 	Req internal.Request
 }
+
+type DeleteRequestMsg struct {
+	ID string
+}

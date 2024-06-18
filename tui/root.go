@@ -138,6 +138,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.db.UpdateRequest(req)
 	case messages.CreateRequestMsg:
 		m.db.CreateRequest(msg.Req)
+	case messages.DeleteRequestMsg:
+		m.db.DeleteRequest(msg.ID)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":

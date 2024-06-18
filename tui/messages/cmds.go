@@ -20,4 +20,7 @@ var (
 	CreateRequestCmd = func(r internal.Request) tea.Cmd {
 		return func() tea.Msg { return CreateRequestMsg{Req: r} }
 	}
+	DeleteRequestCmd = func(id string) tea.Cmd {
+		return func() tea.Msg { return DeleteRequestMsg{ID: id} }
+	}
 )

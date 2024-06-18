@@ -123,7 +123,13 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 }
 
 func (m CollectionPaneModel) footer() string {
-	return strconv.Itoa(m.table.Cursor()+1) + " / " + strconv.Itoa(len(m.table.Rows()))
+	cursor := m.table.Cursor() + 1
+	total := len(m.table.Rows())
+	cursorString := " -"
+	if cursor <= total {
+		cursorString = strconv.Itoa(cursor)
+	}
+	return cursorString + " / " + strconv.Itoa(total)
 }
 
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
@@ -173,6 +179,10 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 				m.editNameDialog.SetValue(m.rctx.Request().Name)
 				m.editNameDialog.Focus()
 				m.dctx.SetDialog(&m.editNameDialog)
+			}
+		case "d":
+			if !m.rctx.Empty() {
+				return m, messages.DeleteRequestCmd(m.rctx.Request().ID())
 			}
 		}
 	}

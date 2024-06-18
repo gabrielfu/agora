@@ -24,7 +24,7 @@ func init() {
 	CollectionPaneKeymap.Set("x", "Execute")
 	CollectionPaneKeymap.Set("n", "New")
 	CollectionPaneKeymap.Set("r", "Rename")
-	// CollectionPaneKeymap.Set("d", "Delete")
+	CollectionPaneKeymap.Set("d", "Delete")
 
 	UrlPaneKeymap.Set("x", "Execute")
 	UrlPaneKeymap.Set("m", "Select method")
