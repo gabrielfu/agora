@@ -25,11 +25,18 @@ const (
 	bodyTab
 )
 
-// fix support for multiple params with same key
 func updateParamCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
 			r.RemoveParam(key, originalValue)
+			r.WithParam(key, value)
+		})
+	}
+}
+
+func newParamCmdFunc() dialogs.DoubleTextInputCmdFunc {
+	return func(key, value string) tea.Cmd {
+		return messages.UpdateRequestCmd(func(r *internal.Request) {
 			r.WithParam(key, value)
 		})
 	}
@@ -51,9 +58,10 @@ type RequestPaneModel struct {
 	rctx *states.RequestContext
 	dctx *states.DialogContext
 
-	tab             requestPaneTab
-	editParamDialog dialogs.TextInputDialog
-	list            list.Model
+	tab                   requestPaneTab
+	editParamDialog       dialogs.TextInputDialog
+	doubleTextInputDialog dialogs.DoubleTextInputDialog
+	list                  list.Model
 }
 
 func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) RequestPaneModel {
@@ -71,6 +79,15 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 		editParamDialog: dialogs.NewTextInputDialog(
 			64,
 			[]string{"Param"},
+			nil,
+			nil,
+			views.RequestPaneView,
+		),
+		doubleTextInputDialog: dialogs.NewDoubleTextInputDialog(
+			64,
+			[]string{"Key"},
+			nil,
+			[]string{"Value"},
 			nil,
 			nil,
 			views.RequestPaneView,
@@ -132,6 +149,12 @@ func (m *RequestPaneModel) handleUpdateParam() {
 	m.dctx.SetDialog(&m.editParamDialog)
 }
 
+func (m *RequestPaneModel) handleNewParam() {
+	m.doubleTextInputDialog.SetCmdFunc(newParamCmdFunc())
+	m.doubleTextInputDialog.FocusUpper()
+	m.dctx.SetDialog(&m.doubleTextInputDialog)
+}
+
 func (m *RequestPaneModel) Refresh() {
 	// refresh param list
 	if !m.rctx.Empty() {
@@ -157,17 +180,21 @@ func (m *RequestPaneModel) Refresh() {
 func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "esc":
-			return m, messages.SetFocusCmd(views.CollectionPaneView)
-		case "[", "shift+tab":
-			m.switchTab(-1)
-		case "]", "tab":
-			m.switchTab(1)
-		case "enter":
-			switch m.tab {
-			case paramsTab:
-				m.handleUpdateParam()
+		if m.dctx.Empty() {
+			switch msg.String() {
+			case "esc":
+				return m, messages.SetFocusCmd(views.CollectionPaneView)
+			case "[", "shift+tab":
+				m.switchTab(-1)
+			case "]", "tab":
+				m.switchTab(1)
+			case "enter":
+				switch m.tab {
+				case paramsTab:
+					m.handleUpdateParam()
+				}
+			case "n":
+				m.handleNewParam()
 			}
 		}
 	case tea.WindowSizeMsg:
