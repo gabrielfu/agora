@@ -111,6 +111,7 @@ func (m *ResponsePaneModel) Refresh() {
 		} else if m.rctx.Response() != nil {
 			text = m.rctx.Response().String()
 		}
+		text = styles.ColorizeJsonIfValid(text)
 		text = lipgloss.NewStyle().Width(m.width - 2).Render(text)
 		m.viewport.SetContent(text)
 
