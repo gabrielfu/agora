@@ -2,7 +2,6 @@
 package states
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
@@ -72,13 +71,11 @@ func (c *RequestContext) Exec() {
 
 	c.err = err
 	if err != nil {
-		fmt.Println("Error:", err)
 		return
 	}
 
 	content, err := io.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println("Error:", err)
 		c.err = err
 		return
 	}
