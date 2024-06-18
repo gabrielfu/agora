@@ -65,6 +65,10 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 		// }),
 	)
 
+	// disable "u" and "d"
+	t.KeyMap.HalfPageUp.SetEnabled(false)
+	t.KeyMap.HalfPageDown.SetEnabled(false)
+
 	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx,
 		editNameDialog: dialogs.NewTextInputDialog(
 			64,
