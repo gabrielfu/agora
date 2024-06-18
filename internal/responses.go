@@ -4,10 +4,10 @@ type Response struct {
 	id         string
 	StatusCode int
 	Content    []byte
-	Headers    map[string]string
+	Headers    KVPairs
 }
 
-func NewResponse(statusCode int, content []byte, headers map[string]string) *Response {
+func NewResponse(statusCode int, content []byte, headers KVPairs) *Response {
 	return &Response{
 		id:         RandomID(),
 		StatusCode: statusCode,
@@ -25,9 +25,10 @@ func (r Response) ID() string {
 }
 
 func (r Response) ContentType() string {
-	v, ok := r.Headers["Content-Type"]
-	if !ok {
-		return ""
+	for _, kv := range r.Headers {
+		if kv.Key == "Content-Type" {
+			return kv.Value
+		}
 	}
-	return v
+	return ""
 }

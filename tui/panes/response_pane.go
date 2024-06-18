@@ -2,7 +2,9 @@ package panes
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -10,6 +12,13 @@ import (
 	"github.com/gabrielfu/tipi/tui/states"
 	"github.com/gabrielfu/tipi/tui/styles"
 	"github.com/gabrielfu/tipi/tui/views"
+)
+
+type responsePaneTab int
+
+const (
+	responseHeadersTab responsePaneTab = iota
+	responseBodyTab
 )
 
 type ResponsePaneModel struct {
@@ -21,10 +30,23 @@ type ResponsePaneModel struct {
 	ready       bool
 	fingerprint string
 	viewport    viewport.Model
+
+	tab  responsePaneTab
+	list list.Model
 }
 
 func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
-	return ResponsePaneModel{rctx: rctx}
+	l := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
+	l.SetShowTitle(false)
+	l.SetShowStatusBar(false)
+	l.SetFilteringEnabled(false)
+	l.SetShowHelp(false)
+	l.SetShowFilter(false)
+	return ResponsePaneModel{
+		rctx: rctx,
+		tab:  responseBodyTab,
+		list: l,
+	}
 }
 
 func (m *ResponsePaneModel) SetWidth(width int) {
@@ -39,9 +61,21 @@ func (m *ResponsePaneModel) SetBorderColor(color string) {
 	m.borderColor = color
 }
 
+func (m ResponsePaneModel) renderTabBar() string {
+	tabs := []string{"Headers", "Body"}
+	tabs[m.tab] = focusedStyle.Render(tabs[m.tab])
+	separator := strings.Repeat(lipgloss.RoundedBorder().Bottom, m.width)
+	separator = lipgloss.NewStyle().Foreground(lipgloss.Color(m.borderColor)).Render(separator)
+	return strings.Join(tabs, " - ") + "\n" + separator + "\n"
+}
+
+func (m *ResponsePaneModel) switchTab(direction int) {
+	m.tab = responsePaneTab((int(m.tab) + direction + 2) % 2)
+}
+
 func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	var footer []string
-	if m.ready && m.viewport.TotalLineCount() > 0 {
+	if m.tab == responseBodyTab && m.ready && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	}
 	border := styles.GenerateBorder(
@@ -49,6 +83,9 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 		styles.GenerateBorderOption{Title: []string{"[4]", "Response"}, Footer: footer},
 		m.width,
 	)
+	// make the corner for the tab bar
+	border.Left = border.Left + border.MiddleLeft + strings.Repeat(border.Left, m.height)
+	border.Right = border.Right + border.MiddleRight + strings.Repeat(border.Right, m.height)
 	return lipgloss.NewStyle().
 		BorderStyle(border).
 		BorderForeground(lipgloss.Color(m.borderColor)).
@@ -57,9 +94,11 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m *ResponsePaneModel) Refresh() {
+	items := make([]list.Item, 0)
 	if m.rctx.Empty() {
 		m.fingerprint = ""
 		m.viewport.SetContent("")
+		m.list.SetItems(items)
 		return
 	}
 
@@ -73,6 +112,13 @@ func (m *ResponsePaneModel) Refresh() {
 			text = m.rctx.Response().String()
 		}
 		m.viewport.SetContent(text)
+
+		if m.rctx.Response() != nil {
+			for _, kv := range m.rctx.Response().Headers {
+				items = append(items, kvItem{key: kv.Key, value: kv.Value})
+			}
+		}
+		m.list.SetItems(items)
 	}
 }
 
@@ -86,6 +132,10 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 		switch msg.String() {
 		case "esc":
 			return m, messages.SetFocusCmd(views.CollectionPaneView)
+		case "[", "shift+tab":
+			m.switchTab(-1)
+		case "]", "tab":
+			m.switchTab(1)
 		}
 	case tea.WindowSizeMsg:
 		verticalMarginHeight := 8
@@ -96,18 +146,27 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 			m.viewport.Width = msg.Width - 2
 			m.viewport.Height = msg.Height - verticalMarginHeight
 		}
+		m.list.SetSize(m.width-2, m.height-3)
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
+	cmds = append(cmds, cmd)
+	m.list, cmd = m.list.Update(msg)
 	cmds = append(cmds, cmd)
 	return m, tea.Batch(cmds...)
 }
 
 func (m ResponsePaneModel) View() string {
 	var text string
-	if !m.ready {
-		text = "Initializing..."
-	} else {
-		text = m.viewport.View()
+	text = m.renderTabBar()
+	switch m.tab {
+	case responseHeadersTab:
+		text += m.list.View()
+	case responseBodyTab:
+		if !m.ready {
+			text += "Initializing..."
+		} else {
+			text += m.viewport.View()
+		}
 	}
 	return m.generateStyle().Render(text)
 }

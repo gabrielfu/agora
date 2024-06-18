@@ -90,7 +90,6 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
 	l.SetShowHelp(false)
-	// l.SetShowPagination(false)
 	l.SetShowFilter(false)
 	return RequestPaneModel{
 		rctx: rctx,

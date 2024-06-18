@@ -80,9 +80,12 @@ func (c *RequestContext) Exec() {
 		return
 	}
 
-	headers := make(map[string]string)
+	var headers internal.KVPairs = make([]internal.KVPair, 0)
 	for k, v := range response.Header {
-		headers[k] = strings.Join(v, ", ")
+		headers = append(headers, internal.KVPair{
+			Key:   k,
+			Value: strings.Join(v, ", "),
+		})
 	}
 
 	c.resp = internal.NewResponse(
