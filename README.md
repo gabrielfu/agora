@@ -12,8 +12,10 @@ All data are saved locally in `$HOME/.agora/data.sqlite`.
 go install github.com/gabrielfu/agora
 ```
 
+Then, you can launch Agora with the command `agora`.
+
 ### Features: Coming Soon
 - [ ] Multiple collections
 - [ ] Response history
-- [ ] Authorization helper
+- [ ] Authentication helper
 - [ ] Environments
