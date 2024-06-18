@@ -17,4 +17,7 @@ var (
 	UpdateRequestCmd          = func(f func(*internal.Request)) tea.Cmd {
 		return func() tea.Msg { return UpdateRequestMsg{Func: f} }
 	}
+	CreateRequestCmd = func(r internal.Request) tea.Cmd {
+		return func() tea.Msg { return CreateRequestMsg{Req: r} }
+	}
 )

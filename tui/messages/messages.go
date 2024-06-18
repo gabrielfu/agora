@@ -18,3 +18,7 @@ type ExecuteRequestMsg struct{}
 type UpdateRequestMsg struct {
 	Func func(*internal.Request)
 }
+
+type CreateRequestMsg struct {
+	Req internal.Request
+}

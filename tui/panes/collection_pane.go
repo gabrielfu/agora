@@ -111,8 +111,10 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 		var display string
 		if request.Name != "" {
 			display = request.Name
-		} else {
+		} else if request.URL != "" {
 			display = styles.RenderURL(request.URL)
+		} else {
+			display = "untitled"
 		}
 		rows = append(rows, table.Row{method, display})
 	}
@@ -164,6 +166,8 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 			return m, messages.ExecuteRequestCmd
 		case "enter":
 			return m, messages.SetFocusCmd(views.UrlPaneView)
+		case "n":
+			return m, messages.CreateRequestCmd(*internal.NewRequest("GET", ""))
 		case "r":
 			if !m.rctx.Empty() {
 				m.editNameDialog.SetValue(m.rctx.Request().Name)
