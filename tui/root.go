@@ -113,7 +113,7 @@ func (m *RootModel) updateDialogFocus() {
 		switch m.dctx.Dialog().(type) {
 		case *dialogs.SelectMethodDialog:
 			m.setFocus(views.SelectMethodDialogView)
-		case *dialogs.TextInputDialog:
+		case *dialogs.TextInputDialog, *dialogs.DoubleTextInputDialog:
 			m.setFocus(views.TextInputDialogView)
 		}
 	}
