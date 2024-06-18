@@ -1,4 +1,4 @@
-module github.com/gabrielfu/tipi
+module github.com/gabrielfu/agora
 
 go 1.22.1
 

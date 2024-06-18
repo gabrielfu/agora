@@ -2,8 +2,8 @@ package messages
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gabrielfu/tipi/internal"
-	"github.com/gabrielfu/tipi/tui/views"
+	"github.com/gabrielfu/agora/internal"
+	"github.com/gabrielfu/agora/tui/views"
 )
 
 var (

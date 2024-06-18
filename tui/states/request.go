@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/gabrielfu/tipi/internal"
+	"github.com/gabrielfu/agora/internal"
 )
 
 type RequestContext struct {

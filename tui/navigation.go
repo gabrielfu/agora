@@ -5,7 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gabrielfu/tipi/tui/views"
+	"github.com/gabrielfu/agora/tui/views"
 )
 
 type NagivationModel struct {

@@ -1,8 +1,8 @@
 package messages
 
 import (
-	"github.com/gabrielfu/tipi/internal"
-	"github.com/gabrielfu/tipi/tui/views"
+	"github.com/gabrielfu/agora/internal"
+	"github.com/gabrielfu/agora/tui/views"
 )
 
 type SetFocusMsg struct {

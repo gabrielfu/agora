@@ -1,6 +1,6 @@
 package states
 
-import "github.com/gabrielfu/tipi/tui/dialogs"
+import "github.com/gabrielfu/agora/tui/dialogs"
 
 type DialogContext struct {
 	dialog dialogs.Dialog

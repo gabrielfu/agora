@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/agora/tui/styles"
 	_ "github.com/mattn/go-sqlite3"
 )
 

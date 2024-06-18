@@ -4,9 +4,9 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gabrielfu/tipi/tui/messages"
-	"github.com/gabrielfu/tipi/tui/styles"
-	"github.com/gabrielfu/tipi/tui/views"
+	"github.com/gabrielfu/agora/tui/messages"
+	"github.com/gabrielfu/agora/tui/styles"
+	"github.com/gabrielfu/agora/tui/views"
 )
 
 type DoubleTextInputCmdFunc func(string, string) tea.Cmd

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/gabrielfu/tipi/tui/styles"
+	"github.com/gabrielfu/agora/tui/styles"
 )
 
 type KVPair struct {

@@ -7,12 +7,12 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gabrielfu/tipi/internal"
-	"github.com/gabrielfu/tipi/tui/dialogs"
-	"github.com/gabrielfu/tipi/tui/messages"
-	"github.com/gabrielfu/tipi/tui/states"
-	"github.com/gabrielfu/tipi/tui/styles"
-	"github.com/gabrielfu/tipi/tui/views"
+	"github.com/gabrielfu/agora/internal"
+	"github.com/gabrielfu/agora/tui/dialogs"
+	"github.com/gabrielfu/agora/tui/messages"
+	"github.com/gabrielfu/agora/tui/states"
+	"github.com/gabrielfu/agora/tui/styles"
+	"github.com/gabrielfu/agora/tui/views"
 )
 
 var focusedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(styles.FocusBorderColor))

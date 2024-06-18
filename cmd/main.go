@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gabrielfu/tipi/internal"
-	"github.com/gabrielfu/tipi/tui"
+	"github.com/gabrielfu/agora/internal"
+	"github.com/gabrielfu/agora/tui"
 )
 
 func Run() error {
@@ -15,7 +15,7 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	dir := filepath.Join(home, ".tipi")
+	dir := filepath.Join(home, ".agora")
 	if err := os.Mkdir(dir, 0755); err != nil && !os.IsExist(err) {
 		return err
 	}

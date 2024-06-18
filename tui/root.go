@@ -4,13 +4,13 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gabrielfu/tipi/internal"
-	"github.com/gabrielfu/tipi/tui/dialogs"
-	"github.com/gabrielfu/tipi/tui/messages"
-	"github.com/gabrielfu/tipi/tui/panes"
-	"github.com/gabrielfu/tipi/tui/states"
-	"github.com/gabrielfu/tipi/tui/styles"
-	"github.com/gabrielfu/tipi/tui/views"
+	"github.com/gabrielfu/agora/internal"
+	"github.com/gabrielfu/agora/tui/dialogs"
+	"github.com/gabrielfu/agora/tui/messages"
+	"github.com/gabrielfu/agora/tui/panes"
+	"github.com/gabrielfu/agora/tui/states"
+	"github.com/gabrielfu/agora/tui/styles"
+	"github.com/gabrielfu/agora/tui/views"
 )
 
 // RootModel implements tea.RootModel interface
