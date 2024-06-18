@@ -236,6 +236,12 @@ func (m *RequestPaneModel) handleUpdateBody() {
 	m.dctx.SetDialog(&m.textAreaDialog)
 }
 
+func (m *RequestPaneModel) handleDeleteBody() tea.Cmd {
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.Body = ""
+	})
+}
+
 // Refresh refreshes the list items based on the current tab.
 func (m *RequestPaneModel) Refresh() {
 	items := make([]list.Item, 0)
@@ -286,6 +292,8 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 					m.handleNewParam()
 				case headersTab:
 					m.handleNewHeader()
+				case bodyTab:
+					m.handleUpdateBody()
 				}
 			case "d":
 				switch m.tab {
@@ -293,6 +301,8 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 					cmds = append(cmds, m.handleDeleteParam())
 				case headersTab:
 					cmds = append(cmds, m.handleDeleteHeader())
+				case bodyTab:
+					cmds = append(cmds, m.handleDeleteBody())
 				}
 			}
 		}
