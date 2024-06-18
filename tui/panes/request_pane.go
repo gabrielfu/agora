@@ -113,7 +113,7 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 		),
 		textAreaDialog: dialogs.NewTextAreaDialog(
 			64,
-			20,
+			7,
 			[]string{"Body"},
 			nil,
 			nil,
