@@ -32,6 +32,8 @@ func init() {
 	UrlPaneKeymap.Set("<esc>", "Back")
 
 	RequestPaneKeymap.Set("<enter>", "Edit")
+	RequestPaneKeymap.Set("n", "New")
+	RequestPaneKeymap.Set("d", "Delete")
 	RequestPaneKeymap.Set("<esc>", "Back")
 
 	ResponsePaneKeymap.Set("<esc>", "Back")

@@ -153,6 +153,17 @@ func (m *RequestPaneModel) handleNewParam() {
 	m.dctx.SetDialog(&m.doubleTextInputDialog)
 }
 
+func (m *RequestPaneModel) handleDeleteParam() tea.Cmd {
+	item, ok := m.list.SelectedItem().(kvItem)
+	if !ok {
+		return nil
+	}
+	key, value := item.key, item.value
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.RemoveParam(key, value)
+	})
+}
+
 func (m *RequestPaneModel) Refresh() {
 	// refresh param list
 	if !m.rctx.Empty() {
@@ -176,6 +187,7 @@ func (m *RequestPaneModel) Refresh() {
 }
 
 func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
+	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if m.dctx.Empty() {
@@ -192,7 +204,15 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 					m.handleUpdateParam()
 				}
 			case "n":
-				m.handleNewParam()
+				switch m.tab {
+				case paramsTab:
+					m.handleNewParam()
+				}
+			case "d":
+				switch m.tab {
+				case paramsTab:
+					cmds = append(cmds, m.handleDeleteParam())
+				}
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -200,7 +220,8 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	}
 	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
-	return m, cmd
+	cmds = append(cmds, cmd)
+	return m, tea.Batch(cmds...)
 }
 
 func (m RequestPaneModel) View() string {
