@@ -328,6 +328,7 @@ func (m RequestPaneModel) View() string {
 		case bodyTab:
 			body := fmt.Sprintf("%v", m.rctx.Request().Body)
 			body = styles.ColorizeJsonIfValid(body)
+			// todo: viewport
 			text += body
 		}
 	}
