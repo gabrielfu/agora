@@ -34,12 +34,10 @@ func updateParamCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
 	}
 }
 
-func newParamCmdFunc() dialogs.DoubleTextInputCmdFunc {
-	return func(key, value string) tea.Cmd {
-		return messages.UpdateRequestCmd(func(r *internal.Request) {
-			r.WithParam(key, value)
-		})
-	}
+var newParamCmdFunc dialogs.DoubleTextInputCmdFunc = func(key, value string) tea.Cmd {
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.WithParam(key, value)
+	})
 }
 
 type kvItem struct {
@@ -150,7 +148,7 @@ func (m *RequestPaneModel) handleUpdateParam() {
 }
 
 func (m *RequestPaneModel) handleNewParam() {
-	m.doubleTextInputDialog.SetCmdFunc(newParamCmdFunc())
+	m.doubleTextInputDialog.SetCmdFunc(newParamCmdFunc)
 	m.doubleTextInputDialog.FocusUpper()
 	m.dctx.SetDialog(&m.doubleTextInputDialog)
 }
