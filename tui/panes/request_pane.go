@@ -271,6 +271,10 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	case tea.KeyMsg:
 		if m.dctx.Empty() {
 			switch msg.String() {
+			case "x":
+				if !m.rctx.Empty() {
+					return m, messages.ExecuteRequestCmd
+				}
 			case "esc":
 				return m, messages.SetFocusCmd(views.CollectionPaneView)
 			case "[", "shift+tab":
