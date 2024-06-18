@@ -59,7 +59,7 @@ type RequestPaneModel struct {
 	dctx *states.DialogContext
 
 	tab                   requestPaneTab
-	editParamDialog       dialogs.TextInputDialog
+	textInputDialog       dialogs.TextInputDialog
 	doubleTextInputDialog dialogs.DoubleTextInputDialog
 	list                  list.Model
 }
@@ -76,7 +76,7 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 		rctx: rctx,
 		dctx: dctx,
 		tab:  paramsTab,
-		editParamDialog: dialogs.NewTextInputDialog(
+		textInputDialog: dialogs.NewTextInputDialog(
 			64,
 			[]string{"Param"},
 			nil,
@@ -142,11 +142,11 @@ func (m *RequestPaneModel) handleUpdateParam() {
 		return
 	}
 	key, value := item.key, item.value
-	m.editParamDialog.SetCmdFunc(updateParamCmdFunc(key, value))
-	m.editParamDialog.SetPrompt(focusedStyle.Render(key + "="))
-	m.editParamDialog.SetValue(value)
-	m.editParamDialog.Focus()
-	m.dctx.SetDialog(&m.editParamDialog)
+	m.textInputDialog.SetCmdFunc(updateParamCmdFunc(key, value))
+	m.textInputDialog.SetPrompt(focusedStyle.Render(key + "="))
+	m.textInputDialog.SetValue(value)
+	m.textInputDialog.Focus()
+	m.dctx.SetDialog(&m.textInputDialog)
 }
 
 func (m *RequestPaneModel) handleNewParam() {
