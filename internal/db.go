@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 
+	"github.com/gabrielfu/tipi/tui/styles"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -36,7 +37,7 @@ func fromRequest(req Request) (RequestDAO, error) {
 		Name:    req.Name,
 		Method:  req.Method,
 		URL:     req.URL,
-		Body:    string(body),
+		Body:    styles.PrettifyJsonIfValid(string(body)),
 		Params:  string(params),
 		Headers: string(headers),
 		Auth:    req.Auth,
@@ -60,7 +61,7 @@ func (r *RequestDAO) toRequest() (Request, error) {
 		Name:    r.Name,
 		Method:  r.Method,
 		URL:     r.URL,
-		Body:    body,
+		Body:    styles.PrettifyJsonIfValid(body),
 		Params:  params,
 		Headers: headers,
 		Auth:    r.Auth,

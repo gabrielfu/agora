@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"sort"
+
+	"github.com/gabrielfu/tipi/tui/styles"
 )
 
 type KVPair struct {
@@ -83,6 +85,10 @@ func (r *Request) WithName(name string) *Request {
 }
 
 func (r *Request) WithBody(body any) *Request {
+	switch body.(type) {
+	case string, []byte:
+		body = styles.MinifyJson(body.(string))
+	}
 	r.Body = body
 	return r
 }
@@ -132,6 +138,11 @@ func (r *Request) RemoveHeader(key, value string) {
 }
 
 func makeJsonBodyReader(body any) (io.Reader, error) {
+	// todo: support other body dtype and content type
+	switch body.(type) {
+	case string, []byte:
+		body = styles.MinifyJson(body.(string))
+	}
 	marshalled, err := json.Marshal(body)
 	if err != nil {
 		return nil, fmt.Errorf("body is not a valid json: %w", err)

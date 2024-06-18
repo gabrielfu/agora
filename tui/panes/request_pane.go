@@ -284,7 +284,9 @@ func (m RequestPaneModel) View() string {
 		case paramsTab, headersTab:
 			text += m.list.View()
 		case bodyTab:
-			text += fmt.Sprintf("%v", m.rctx.Request().Body)
+			body := fmt.Sprintf("%v", m.rctx.Request().Body)
+			body = styles.ColorizeJsonIfValid(body)
+			text += body
 		}
 	}
 	return m.generateStyle().Render(text)

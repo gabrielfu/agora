@@ -12,6 +12,7 @@ require (
 require (
 	github.com/elliotchance/orderedmap/v2 v2.2.0
 	github.com/matoous/go-nanoid/v2 v2.1.0
+	github.com/tidwall/pretty v1.2.1
 )
 
 require (
