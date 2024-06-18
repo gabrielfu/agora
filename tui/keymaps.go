@@ -22,7 +22,7 @@ var (
 func init() {
 	CollectionPaneKeymap.Set("<enter>", "Select")
 	CollectionPaneKeymap.Set("x", "Execute")
-	// CollectionPaneKeymap.Set("n", "New")
+	CollectionPaneKeymap.Set("n", "New")
 	CollectionPaneKeymap.Set("r", "Rename")
 	// CollectionPaneKeymap.Set("d", "Delete")
 
