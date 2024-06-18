@@ -45,7 +45,7 @@ func fromRequest(req Request) (RequestDAO, error) {
 
 func (r *RequestDAO) toRequest() (Request, error) {
 	var body string
-	var params, headers map[string]string
+	var params, headers KVPairs
 	if err := json.Unmarshal([]byte(r.Body), &body); err != nil {
 		return Request{}, err
 	}

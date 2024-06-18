@@ -26,10 +26,11 @@ const (
 )
 
 // fix support for multiple params with same key
-func updateParamCmdFunc(key string) dialogs.TextInputCmdFunc {
+func updateParamCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
-			r.Params[key] = value
+			r.RemoveParam(key, originalValue)
+			r.WithParam(key, value)
 		})
 	}
 }
@@ -124,7 +125,7 @@ func (m *RequestPaneModel) handleUpdateParam() {
 		return
 	}
 	key, value := item.key, item.value
-	m.editParamDialog.SetCmdFunc(updateParamCmdFunc(key))
+	m.editParamDialog.SetCmdFunc(updateParamCmdFunc(key, value))
 	m.editParamDialog.SetPrompt(focusedStyle.Render(key + "="))
 	m.editParamDialog.SetValue(value)
 	m.editParamDialog.Focus()
@@ -137,14 +138,14 @@ func (m *RequestPaneModel) Refresh() {
 		switch m.tab {
 		case paramsTab:
 			var items []list.Item
-			for k, v := range m.rctx.Request().Params {
-				items = append(items, kvItem{key: k, value: v})
+			for _, kv := range m.rctx.Request().Params {
+				items = append(items, kvItem{key: kv.Key, value: kv.Value})
 			}
 			m.list.SetItems(items)
 		case headersTab:
 			var items []list.Item
-			for k, v := range m.rctx.Request().Headers {
-				items = append(items, kvItem{key: k, value: v})
+			for _, kv := range m.rctx.Request().Headers {
+				items = append(items, kvItem{key: kv.Key, value: kv.Value})
 			}
 			m.list.SetItems(items)
 		default:

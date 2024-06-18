@@ -6,29 +6,63 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 
 	"github.com/google/uuid"
 )
 
+type KVPair struct {
+	Key   string `json:"k"`
+	Value string `json:"v"`
+}
+
+type KVPairs []KVPair
+
+func (kvs KVPairs) Sort() {
+	sort.Slice(kvs, func(i, j int) bool {
+		if kvs[i].Key != kvs[j].Key {
+			return kvs[i].Key < kvs[j].Key
+		}
+		return kvs[i].Value < kvs[j].Value
+	})
+}
+
+func (kvs KVPairs) Add(key, value string) KVPairs {
+	return append(kvs, KVPair{Key: key, Value: value})
+}
+
+// Remove removes the first occurrence of the key-value pair from the list.
+func (kvs KVPairs) Remove(key, value string) KVPairs {
+	var newKvs KVPairs
+	removed := false
+	for _, kv := range kvs {
+		if !removed && (kv.Key == key && kv.Value == value) {
+			removed = true
+			continue
+		}
+		newKvs = append(newKvs, kv)
+	}
+	return newKvs
+}
+
 type Request struct {
-	id      string
-	Name    string
-	Method  string
-	URL     string
-	Body    any // only supports json body for now
-	Params  map[string]string
-	Headers map[string]string
+	id     string
+	Name   string
+	Method string
+	URL    string
+	Body   any // only supports json body for now
+	// we use array of kv pair to preserve order
+	Params  KVPairs
+	Headers KVPairs
 	Auth    string
 }
 
 // NewRequest creates a new request with a random id.
 func NewRequest(method, url string) *Request {
 	return &Request{
-		id:      randomID(),
-		Method:  method,
-		URL:     url,
-		Params:  make(map[string]string),
-		Headers: make(map[string]string),
+		id:     randomID(),
+		Method: method,
+		URL:    url,
 	}
 }
 
@@ -60,21 +94,21 @@ func (r *Request) WithBody(body any) *Request {
 }
 
 func (r *Request) WithParam(key, value string) *Request {
-	r.Params[key] = value
+	r.Params = append(r.Params, KVPair{Key: key, Value: value})
 	return r
 }
 
-func (r *Request) WithParams(params map[string]string) *Request {
+func (r *Request) WithParams(params KVPairs) *Request {
 	r.Params = params
 	return r
 }
 
 func (r *Request) WithHeader(key, value string) *Request {
-	r.Headers[key] = value
+	r.Headers = append(r.Headers, KVPair{Key: key, Value: value})
 	return r
 }
 
-func (r *Request) WithHeaders(headers map[string]string) *Request {
+func (r *Request) WithHeaders(headers KVPairs) *Request {
 	r.Headers = headers
 	return r
 }
@@ -93,6 +127,14 @@ func (r Request) String() string {
 		"Request(ID=%s, Name=%s, Method=%s, URL=%s, Body=%v, Params=%v, Headers=%v, Auth=%s}",
 		r.id, r.Name, r.Method, r.URL, r.Body, r.Params, r.Headers, r.Auth,
 	)
+}
+
+func (r *Request) RemoveParam(key, value string) {
+	r.Params = r.Params.Remove(key, value)
+}
+
+func (r *Request) RemoveHeader(key, value string) {
+	r.Headers = r.Headers.Remove(key, value)
 }
 
 func makeJsonBodyReader(body any) (io.Reader, error) {
@@ -118,13 +160,13 @@ func (r *Request) Exec() (*http.Response, error) {
 	}
 
 	q := req.URL.Query()
-	for k, v := range r.Params {
-		q.Add(k, v)
+	for _, kv := range r.Params {
+		q.Add(kv.Key, kv.Value)
 	}
 	req.URL.RawQuery = q.Encode()
 
-	for k, v := range r.Headers {
-		req.Header.Add(k, v)
+	for _, kv := range r.Headers {
+		req.Header.Add(kv.Key, kv.Value)
 	}
 	client := &http.Client{}
 	return client.Do(req)
