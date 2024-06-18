@@ -68,6 +68,8 @@ func (m *TextInputDialog) SetWidth(windowWidth int) {
 	m.width = min(m.maxWidth, windowWidth-4)
 }
 
+func (m *TextInputDialog) SetHeight(int) {}
+
 func (m *TextInputDialog) SetCmdFunc(cmdFunc TextInputCmdFunc) {
 	m.submitCmdFunc = cmdFunc
 }

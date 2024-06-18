@@ -72,7 +72,7 @@ func (m *TextAreaDialog) SetWidth(windowWidth int) {
 }
 
 func (m *TextAreaDialog) SetHeight(windowHeight int) {
-	m.height = min(m.maxHeight, windowHeight-4)
+	m.height = min(m.maxHeight, windowHeight-7)
 }
 
 func (m *TextAreaDialog) SetCmdFunc(cmdFunc TextAreaCmdFunc) {

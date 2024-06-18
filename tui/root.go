@@ -201,6 +201,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.responsePane.SetHeight(m.height - 3)
 
 		m.dctx.SetDialogWidth(m.width)
+		m.dctx.SetDialogHeight(m.height)
 
 		cmd = m.updatePanes(msg)
 		cmds = append(cmds, cmd)

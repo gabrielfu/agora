@@ -94,6 +94,8 @@ func (m SelectMethodDialog) updateRequest() tea.Cmd {
 
 func (m *SelectMethodDialog) SetWidth(width int) {}
 
+func (m *SelectMethodDialog) SetHeight(width int) {}
+
 func (m *SelectMethodDialog) Update(msg tea.Msg) (any, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:

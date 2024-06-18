@@ -105,6 +105,8 @@ func (m *DoubleTextInputDialog) SetWidth(windowWidth int) {
 	m.width = min(m.maxWidth, windowWidth-4)
 }
 
+func (m *DoubleTextInputDialog) SetHeight(int) {}
+
 func (m *DoubleTextInputDialog) SetCmdFunc(cmdFunc DoubleTextInputCmdFunc) {
 	m.submitCmdFunc = cmdFunc
 }

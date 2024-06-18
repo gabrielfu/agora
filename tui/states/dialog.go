@@ -27,6 +27,12 @@ func (d *DialogContext) SetDialogWidth(width int) {
 	}
 }
 
+func (d *DialogContext) SetDialogHeight(height int) {
+	if d.dialog != nil {
+		d.dialog.SetHeight(height)
+	}
+}
+
 func (d *DialogContext) Dialog() dialogs.Dialog {
 	return d.dialog
 }
