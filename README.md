@@ -3,6 +3,8 @@
 Agora is a simple and basic app that lets you build API requests on the terminal. It is inspired by [lazygit](https://github.com/jesseduffield/lazygit) and [Postman](https://www.postman.com/).
 
 
+[](./assets/demo.mp4)
+
 ### Installation
 
 ```shell
