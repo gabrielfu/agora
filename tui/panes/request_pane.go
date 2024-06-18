@@ -40,6 +40,21 @@ var newParamCmdFunc dialogs.DoubleTextInputCmdFunc = func(key, value string) tea
 	})
 }
 
+func updateHeaderCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
+	return func(value string) tea.Cmd {
+		return messages.UpdateRequestCmd(func(r *internal.Request) {
+			r.RemoveHeader(key, originalValue)
+			r.WithHeader(key, value)
+		})
+	}
+}
+
+var newHeaderCmdFunc dialogs.DoubleTextInputCmdFunc = func(key, value string) tea.Cmd {
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.WithHeader(key, value)
+	})
+}
+
 type kvItem struct {
 	key, value string
 }
@@ -164,6 +179,36 @@ func (m *RequestPaneModel) handleDeleteParam() tea.Cmd {
 	})
 }
 
+func (m *RequestPaneModel) handleUpdateHeader() {
+	item, ok := m.list.SelectedItem().(kvItem)
+	if !ok {
+		return
+	}
+	key, value := item.key, item.value
+	m.textInputDialog.SetCmdFunc(updateHeaderCmdFunc(key, value))
+	m.textInputDialog.SetPrompt(focusedStyle.Render(key + "="))
+	m.textInputDialog.SetValue(value)
+	m.textInputDialog.Focus()
+	m.dctx.SetDialog(&m.textInputDialog)
+}
+
+func (m *RequestPaneModel) handleNewHeader() {
+	m.doubleTextInputDialog.SetCmdFunc(newHeaderCmdFunc)
+	m.doubleTextInputDialog.FocusUpper()
+	m.dctx.SetDialog(&m.doubleTextInputDialog)
+}
+
+func (m *RequestPaneModel) handleDeleteHeader() tea.Cmd {
+	item, ok := m.list.SelectedItem().(kvItem)
+	if !ok {
+		return nil
+	}
+	key, value := item.key, item.value
+	return messages.UpdateRequestCmd(func(r *internal.Request) {
+		r.RemoveHeader(key, value)
+	})
+}
+
 func (m *RequestPaneModel) Refresh() {
 	// refresh param list
 	if !m.rctx.Empty() {
@@ -202,16 +247,22 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 				switch m.tab {
 				case paramsTab:
 					m.handleUpdateParam()
+				case headersTab:
+					m.handleUpdateHeader()
 				}
 			case "n":
 				switch m.tab {
 				case paramsTab:
 					m.handleNewParam()
+				case headersTab:
+					m.handleNewHeader()
 				}
 			case "d":
 				switch m.tab {
 				case paramsTab:
 					cmds = append(cmds, m.handleDeleteParam())
+				case headersTab:
+					cmds = append(cmds, m.handleDeleteHeader())
 				}
 			}
 		}
