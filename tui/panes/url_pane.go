@@ -98,7 +98,7 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 			if !m.rctx.Empty() {
 				m.dctx.SetDialog(&m.selectMethodDialog)
 			}
-		case "u":
+		case "enter":
 			if !m.rctx.Empty() {
 				m.editUrlDialog.SetValue(m.rctx.Request().URL)
 				m.editUrlDialog.Focus()

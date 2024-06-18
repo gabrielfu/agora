@@ -27,10 +27,11 @@ func init() {
 
 	UrlPaneKeymap.Set("e", "Execute")
 	UrlPaneKeymap.Set("m", "Select method")
-	UrlPaneKeymap.Set("u", "Edit url")
+	UrlPaneKeymap.Set("<enter>", "Edit")
 	UrlPaneKeymap.Set("r", "Rename")
 	UrlPaneKeymap.Set("<esc>", "Back")
 
+	RequestPaneKeymap.Set("<enter>", "Edit")
 	RequestPaneKeymap.Set("<esc>", "Back")
 
 	ResponsePaneKeymap.Set("<esc>", "Back")
