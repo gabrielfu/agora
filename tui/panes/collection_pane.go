@@ -160,7 +160,7 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "e":
+		case "x":
 			return m, messages.ExecuteRequestCmd
 		case "enter":
 			return m, messages.SetFocusCmd(views.UrlPaneView)

@@ -20,12 +20,12 @@ var (
 
 func init() {
 	CollectionPaneKeymap.Set("<enter>", "Select")
-	CollectionPaneKeymap.Set("e", "Execute")
+	CollectionPaneKeymap.Set("x", "Execute")
 	// CollectionPaneKeymap.Set("n", "New")
 	CollectionPaneKeymap.Set("r", "Rename")
 	// CollectionPaneKeymap.Set("d", "Delete")
 
-	UrlPaneKeymap.Set("e", "Execute")
+	UrlPaneKeymap.Set("x", "Execute")
 	UrlPaneKeymap.Set("m", "Select method")
 	UrlPaneKeymap.Set("<enter>", "Edit")
 	UrlPaneKeymap.Set("r", "Rename")
