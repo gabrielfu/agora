@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gabrielfu/agora/internal"
 	"github.com/gabrielfu/agora/tui/messages"
 	"github.com/gabrielfu/agora/tui/states"
 	"github.com/gabrielfu/agora/tui/styles"
@@ -71,6 +72,27 @@ func (m ResponsePaneModel) renderTabBar() string {
 
 func (m *ResponsePaneModel) switchTab(direction int) {
 	m.tab = responsePaneTab((int(m.tab) + direction + 2) % 2)
+}
+
+func (m ResponsePaneModel) renderStatus() string {
+	if m.rctx.Empty() {
+		return ""
+	}
+	var text, color string
+	if err := m.rctx.Error(); err != nil {
+		text = "Error"
+		color = styles.StatusErrorColor
+	} else if m.rctx.Response() != nil {
+		statusCode := m.rctx.Response().StatusCode
+		text = fmt.Sprintf("%d %s", statusCode, internal.StatusText(statusCode))
+		color = styles.StatusCodeColor(statusCode)
+	} else {
+		return ""
+	}
+	return lipgloss.NewStyle().
+		Width(m.width-2).
+		Foreground(lipgloss.Color(color)).
+		Render(text) + "\n"
 }
 
 func (m ResponsePaneModel) generateStyle() lipgloss.Style {
@@ -140,7 +162,7 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 			m.switchTab(1)
 		}
 	case tea.WindowSizeMsg:
-		verticalMarginHeight := 8
+		verticalMarginHeight := 9
 		if !m.ready {
 			m.viewport = viewport.New(msg.Width-2, msg.Height-verticalMarginHeight)
 			m.ready = true
@@ -160,6 +182,7 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 func (m ResponsePaneModel) View() string {
 	var text string
 	text = m.renderTabBar()
+	text += m.renderStatus()
 	switch m.tab {
 	case responseHeadersTab:
 		text += m.list.View()
