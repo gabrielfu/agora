@@ -13,6 +13,7 @@ import (
 	"github.com/gabrielfu/agora/tui/states"
 	"github.com/gabrielfu/agora/tui/styles"
 	"github.com/gabrielfu/agora/tui/views"
+	"github.com/mattn/go-runewidth"
 )
 
 type responsePaneTab int
@@ -89,8 +90,10 @@ func (m ResponsePaneModel) renderStatus() string {
 	} else {
 		return ""
 	}
+	text = runewidth.Truncate(text, m.width-2, "…")
 	return lipgloss.NewStyle().
 		Width(m.width-2).
+		MaxHeight(1).
 		Foreground(lipgloss.Color(color)).
 		Render(text) + "\n"
 }
