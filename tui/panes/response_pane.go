@@ -29,12 +29,11 @@ type ResponsePaneModel struct {
 	borderColor string
 
 	rctx        *states.RequestContext
-	ready       bool
 	fingerprint string
-	viewport    viewport.Model
 
-	tab  responsePaneTab
-	list list.Model
+	tab      responsePaneTab
+	viewport viewport.Model
+	list     list.Model
 }
 
 func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
@@ -45,9 +44,10 @@ func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
 	l.SetShowHelp(false)
 	l.SetShowFilter(false)
 	return ResponsePaneModel{
-		rctx: rctx,
-		tab:  responseBodyTab,
-		list: l,
+		rctx:     rctx,
+		tab:      responseBodyTab,
+		list:     l,
+		viewport: viewport.New(0, 0),
 	}
 }
 
@@ -100,7 +100,7 @@ func (m ResponsePaneModel) renderStatus() string {
 
 func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	var footer []string
-	if m.tab == responseBodyTab && m.ready && m.viewport.TotalLineCount() > 0 {
+	if m.tab == responseBodyTab && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	}
 	border := styles.GenerateBorder(
@@ -166,13 +166,8 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		verticalMarginHeight := 9
-		if !m.ready {
-			m.viewport = viewport.New(msg.Width-2, msg.Height-verticalMarginHeight)
-			m.ready = true
-		} else {
-			m.viewport.Width = msg.Width - 2
-			m.viewport.Height = msg.Height - verticalMarginHeight
-		}
+		m.viewport.Width = msg.Width - 2
+		m.viewport.Height = msg.Height - verticalMarginHeight
 		m.list.SetSize(m.width-2, m.height-3)
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
@@ -190,11 +185,7 @@ func (m ResponsePaneModel) View() string {
 	case responseHeadersTab:
 		text += m.list.View()
 	case responseBodyTab:
-		if !m.ready {
-			text += "Initializing..."
-		} else {
-			text += m.viewport.View()
-		}
+		text += m.viewport.View()
 	}
 	return m.generateStyle().Render(text)
 }
