@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/agora/internal"
@@ -81,6 +82,7 @@ type RequestPaneModel struct {
 	textInputDialog       dialogs.TextInputDialog
 	doubleTextInputDialog dialogs.DoubleTextInputDialog
 	textAreaDialog        dialogs.TextAreaDialog
+	viewport              viewport.Model
 	list                  list.Model
 }
 
@@ -119,7 +121,8 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 			nil,
 			views.RequestPaneView,
 		),
-		list: l,
+		list:     l,
+		viewport: viewport.New(0, 0),
 	}
 }
 
@@ -148,9 +151,13 @@ func (m *RequestPaneModel) switchTab(direction int) {
 }
 
 func (m RequestPaneModel) generateStyle() lipgloss.Style {
+	var footer []string
+	if m.tab == bodyTab && m.viewport.TotalLineCount() > 0 {
+		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		styles.GenerateBorderOption{Title: []string{"[3]", "Request"}},
+		styles.GenerateBorderOption{Title: []string{"[3]", "Request"}, Footer: footer},
 		m.width,
 	)
 	// make the corner for the tab bar
@@ -245,6 +252,7 @@ func (m *RequestPaneModel) handleDeleteBody() tea.Cmd {
 func (m *RequestPaneModel) Refresh() {
 	items := make([]list.Item, 0)
 	if m.rctx.Empty() {
+		m.viewport.SetContent("")
 		m.list.SetItems(items)
 		return
 	}
@@ -259,13 +267,20 @@ func (m *RequestPaneModel) Refresh() {
 			items = append(items, kvItem{key: kv.Key, value: kv.Value})
 		}
 		m.list.SetItems(items)
+	case bodyTab:
+		body := fmt.Sprintf("%v", m.rctx.Request().Body)
+		body = styles.ColorizeJsonIfValid(body)
+		m.viewport.SetContent(body)
 	default:
 		m.list.SetItems(items)
 	}
 }
 
 func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
-	var cmds []tea.Cmd
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if m.dctx.Empty() {
@@ -310,9 +325,13 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 			}
 		}
 	case tea.WindowSizeMsg:
+		verticalMarginHeight := 9
+		m.viewport.Width = msg.Width - 2
+		m.viewport.Height = msg.Height - verticalMarginHeight
 		m.list.SetSize(m.width-2, m.height-3)
 	}
-	var cmd tea.Cmd
+	m.viewport, cmd = m.viewport.Update(msg)
+	cmds = append(cmds, cmd)
 	m.list, cmd = m.list.Update(msg)
 	cmds = append(cmds, cmd)
 	return m, tea.Batch(cmds...)
@@ -326,10 +345,7 @@ func (m RequestPaneModel) View() string {
 		case paramsTab, headersTab:
 			text += m.list.View()
 		case bodyTab:
-			body := fmt.Sprintf("%v", m.rctx.Request().Body)
-			body = styles.ColorizeJsonIfValid(body)
-			// todo: viewport
-			text += body
+			text += m.viewport.View()
 		}
 	}
 	return m.generateStyle().Render(text)
