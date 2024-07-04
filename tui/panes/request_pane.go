@@ -21,9 +21,9 @@ var focusedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(styles.FocusBor
 type requestPaneTab int
 
 const (
-	paramsTab requestPaneTab = iota
-	headersTab
-	bodyTab
+	requestParamsTab requestPaneTab = iota
+	requestHeadersTab
+	requestBodyTab
 )
 
 func updateParamCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
@@ -96,7 +96,7 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 	return RequestPaneModel{
 		rctx: rctx,
 		dctx: dctx,
-		tab:  paramsTab,
+		tab:  requestParamsTab,
 		textInputDialog: dialogs.NewTextInputDialog(
 			64,
 			[]string{"Param"},
@@ -152,7 +152,7 @@ func (m *RequestPaneModel) switchTab(direction int) {
 
 func (m RequestPaneModel) generateStyle() lipgloss.Style {
 	var footer []string
-	if m.tab == bodyTab && m.viewport.TotalLineCount() > 0 {
+	if m.tab == requestBodyTab && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	}
 	border := styles.GenerateBorder(
@@ -257,17 +257,17 @@ func (m *RequestPaneModel) Refresh() {
 		return
 	}
 	switch m.tab {
-	case paramsTab:
+	case requestParamsTab:
 		for _, kv := range m.rctx.Request().Params {
 			items = append(items, kvItem{key: kv.Key, value: kv.Value})
 		}
 		m.list.SetItems(items)
-	case headersTab:
+	case requestHeadersTab:
 		for _, kv := range m.rctx.Request().Headers {
 			items = append(items, kvItem{key: kv.Key, value: kv.Value})
 		}
 		m.list.SetItems(items)
-	case bodyTab:
+	case requestBodyTab:
 		body := fmt.Sprintf("%v", m.rctx.Request().Body)
 		body = styles.ColorizeJsonIfValid(body)
 		m.viewport.SetContent(body)
@@ -297,29 +297,29 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 				m.switchTab(1)
 			case "enter":
 				switch m.tab {
-				case paramsTab:
+				case requestParamsTab:
 					m.handleUpdateParam()
-				case headersTab:
+				case requestHeadersTab:
 					m.handleUpdateHeader()
-				case bodyTab:
+				case requestBodyTab:
 					m.handleUpdateBody()
 				}
 			case "n":
 				switch m.tab {
-				case paramsTab:
+				case requestParamsTab:
 					m.handleNewParam()
-				case headersTab:
+				case requestHeadersTab:
 					m.handleNewHeader()
-				case bodyTab:
+				case requestBodyTab:
 					m.handleUpdateBody()
 				}
 			case "d":
 				switch m.tab {
-				case paramsTab:
+				case requestParamsTab:
 					cmds = append(cmds, m.handleDeleteParam())
-				case headersTab:
+				case requestHeadersTab:
 					cmds = append(cmds, m.handleDeleteHeader())
-				case bodyTab:
+				case requestBodyTab:
 					cmds = append(cmds, m.handleDeleteBody())
 				}
 			}
@@ -342,9 +342,9 @@ func (m RequestPaneModel) View() string {
 	text = m.renderTabBar()
 	if !m.rctx.Empty() {
 		switch m.tab {
-		case paramsTab, headersTab:
+		case requestParamsTab, requestHeadersTab:
 			text += m.list.View()
-		case bodyTab:
+		case requestBodyTab:
 			text += m.viewport.View()
 		}
 	}
