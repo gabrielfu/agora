@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type RequestDAO struct {
+type requestDAO struct {
 	id      string
 	Name    string
 	Method  string
@@ -19,20 +19,20 @@ type RequestDAO struct {
 	Auth    string
 }
 
-func fromRequest(req Request) (RequestDAO, error) {
+func fromRequest(req Request) (requestDAO, error) {
 	body, err := json.Marshal(req.Body)
 	if err != nil {
-		return RequestDAO{}, err
+		return requestDAO{}, err
 	}
 	params, err := json.Marshal(req.Params)
 	if err != nil {
-		return RequestDAO{}, err
+		return requestDAO{}, err
 	}
 	headers, err := json.Marshal(req.Headers)
 	if err != nil {
-		return RequestDAO{}, err
+		return requestDAO{}, err
 	}
-	return RequestDAO{
+	return requestDAO{
 		id:      req.ID(),
 		Name:    req.Name,
 		Method:  req.Method,
@@ -44,7 +44,7 @@ func fromRequest(req Request) (RequestDAO, error) {
 	}, nil
 }
 
-func (r *RequestDAO) toRequest() (Request, error) {
+func (r *requestDAO) toRequest() (Request, error) {
 	var body string
 	var params, headers KVPairs
 	if err := json.Unmarshal([]byte(r.Body), &body); err != nil {
@@ -120,7 +120,7 @@ func (r *RequestDatabase) CreateRequest(req Request) error {
 }
 
 func (r *RequestDatabase) GetRequest(id string) (Request, error) {
-	var dao RequestDAO
+	var dao requestDAO
 	err := r.db.QueryRow(
 		"SELECT id, name, method, url, body, params, headers, auth FROM requests WHERE id = ?",
 		id,
@@ -139,7 +139,7 @@ func (r *RequestDatabase) ListRequests() ([]Request, error) {
 	defer rows.Close()
 	var requests []Request
 	for rows.Next() {
-		var dao RequestDAO
+		var dao requestDAO
 		if err := rows.Scan(&dao.id, &dao.Name, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth); err != nil {
 			return nil, err
 		}
