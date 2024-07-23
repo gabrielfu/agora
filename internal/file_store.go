@@ -84,7 +84,6 @@ func (r *RequestFileStore) ListRequests() ([]Request, error) {
 }
 
 func (r *RequestFileStore) UpdateRequest(req Request) error {
-	r.DeleteRequest(req.ID)
 	return r.CreateRequest(req)
 }
 
