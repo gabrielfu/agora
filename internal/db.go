@@ -3,7 +3,6 @@ package internal
 import (
 	"os"
 	"path/filepath"
-	"sync"
 
 	"gopkg.in/yaml.v3"
 )
@@ -13,7 +12,7 @@ type RequestFileStore struct {
 }
 
 func NewRquestFileStore(root string) (*RequestFileStore, error) {
-	if err := os.Mkdir(root, 0755); err != nil && !os.IsExist(err) {
+	if err := os.MkdirAll(root, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
 	}
 	return &RequestFileStore{root: root}, nil
@@ -42,7 +41,7 @@ func (r *RequestFileStore) CreateRequest(req Request) error {
 	if err != nil {
 		return err
 	}
-	filename := r.calcFilename(req.id)
+	filename := r.calcFilename(req.ID)
 	return os.WriteFile(filename, data, 0755)
 }
 
@@ -57,43 +56,20 @@ func (r *RequestFileStore) ListRequests() ([]Request, error) {
 		return nil, err
 	}
 
-	read := func(filename string, wg *sync.WaitGroup, ch chan<- Request, ech chan<- error) {
-		defer wg.Done()
+	var reqs []Request
+	for _, e := range entries {
+		filename := filepath.Join(r.root, e.Name())
 		req, err := readFile(filename)
 		if err != nil {
-			ech <- err
-		} else {
-			ch <- req
+			return nil, err
 		}
-	}
-
-	var wg sync.WaitGroup
-	ch := make(chan Request)
-	ech := make(chan error)
-	for _, e := range entries {
-		wg.Add(1)
-		filename := filepath.Join(r.root, e.Name())
-		go read(filename, &wg, ch, ech)
-	}
-
-	go func() {
-		wg.Wait()
-		close(ch)
-		close(ech)
-	}()
-
-	for err := range ech {
-		return nil, err
-	}
-
-	var reqs []Request
-	for req := range ch {
 		reqs = append(reqs, req)
 	}
 	return reqs, nil
 }
 
 func (r *RequestFileStore) UpdateRequest(req Request) error {
+	r.DeleteRequest(req.ID)
 	return r.CreateRequest(req)
 }
 
