@@ -98,6 +98,18 @@ func (m ResponsePaneModel) renderStatus() string {
 		Render(text) + "\n"
 }
 
+func (m ResponsePaneModel) renderDuration() string {
+	if m.rctx.Response() == nil {
+		return ""
+	}
+	text := m.rctx.Duration().String()
+	return lipgloss.NewStyle().
+		Width(m.width-2).
+		MaxHeight(1).
+		Foreground(lipgloss.Color(styles.StatusCode200Color)).
+		Render(text) + "\n"
+}
+
 func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	var footer []string
 	if m.tab == responseBodyTab && m.viewport.TotalLineCount() > 0 {
@@ -165,10 +177,10 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 			m.switchTab(1)
 		}
 	case tea.WindowSizeMsg:
-		verticalMarginHeight := 9
+		verticalMarginHeight := 10
 		m.viewport.Width = msg.Width - 2
 		m.viewport.Height = msg.Height - verticalMarginHeight
-		m.list.SetSize(m.width-2, m.height-3)
+		m.list.SetSize(m.width-2, m.height-4)
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
@@ -181,6 +193,7 @@ func (m ResponsePaneModel) View() string {
 	var text string
 	text = m.renderTabBar()
 	text += m.renderStatus()
+	text += m.renderDuration()
 	switch m.tab {
 	case responseHeadersTab:
 		text += m.list.View()

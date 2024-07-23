@@ -4,6 +4,7 @@ package states
 import (
 	"io"
 	"strings"
+	"time"
 
 	"github.com/gabrielfu/agora/internal"
 )
@@ -13,6 +14,7 @@ type RequestContext struct {
 	resp        *internal.Response
 	err         error
 	fingerprint string // not a real fingerprint, just a string to identify the state
+	duration    time.Duration
 }
 
 func NewRequestContext() *RequestContext {
@@ -58,15 +60,28 @@ func (c *RequestContext) SetError(err error) {
 	c.newFingerprint()
 }
 
+func (c *RequestContext) Duration() time.Duration {
+	return c.duration
+}
+
+func (c *RequestContext) SetDuration(d time.Duration) {
+	c.duration = d
+	c.newFingerprint()
+}
+
 func (c *RequestContext) Clear() {
 	c.req = nil
 	c.resp = nil
 	c.err = nil
 	c.fingerprint = ""
+	c.duration = 0
 }
 
 func (c *RequestContext) Exec() {
+	start := time.Now()
 	response, err := c.req.Exec()
+	duration := time.Since(start)
+	c.duration = duration
 	defer c.newFingerprint()
 
 	c.err = err
