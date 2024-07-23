@@ -1,170 +1,103 @@
 package internal
 
 import (
-	"database/sql"
-	"encoding/json"
+	"os"
+	"path/filepath"
+	"sync"
 
-	"github.com/gabrielfu/agora/tui/styles"
-	_ "github.com/mattn/go-sqlite3"
+	"gopkg.in/yaml.v3"
 )
 
-type requestDAO struct {
-	id      string
-	Name    string
-	Method  string
-	URL     string
-	Body    string
-	Params  string
-	Headers string
-	Auth    string
+type RequestFileStore struct {
+	root string
 }
 
-func fromRequest(req Request) (requestDAO, error) {
-	body, err := json.Marshal(req.Body)
-	if err != nil {
-		return requestDAO{}, err
-	}
-	params, err := json.Marshal(req.Params)
-	if err != nil {
-		return requestDAO{}, err
-	}
-	headers, err := json.Marshal(req.Headers)
-	if err != nil {
-		return requestDAO{}, err
-	}
-	return requestDAO{
-		id:      req.ID(),
-		Name:    req.Name,
-		Method:  req.Method,
-		URL:     req.URL,
-		Body:    styles.PrettifyJsonIfValid(string(body)),
-		Params:  string(params),
-		Headers: string(headers),
-		Auth:    req.Auth,
-	}, nil
-}
-
-func (r *requestDAO) toRequest() (Request, error) {
-	var body string
-	var params, headers KVPairs
-	if err := json.Unmarshal([]byte(r.Body), &body); err != nil {
-		return Request{}, err
-	}
-	if err := json.Unmarshal([]byte(r.Params), &params); err != nil {
-		return Request{}, err
-	}
-	if err := json.Unmarshal([]byte(r.Headers), &headers); err != nil {
-		return Request{}, err
-	}
-	return Request{
-		id:      r.id,
-		Name:    r.Name,
-		Method:  r.Method,
-		URL:     r.URL,
-		Body:    styles.PrettifyJsonIfValid(body),
-		Params:  params,
-		Headers: headers,
-		Auth:    r.Auth,
-	}, nil
-}
-
-type RequestDatabase struct {
-	db *sql.DB
-}
-
-func NewRquestDatabase(path string) (*RequestDatabase, error) {
-	db, err := sql.Open("sqlite3", path)
-	if err != nil {
+func NewRquestFileStore(root string) (*RequestFileStore, error) {
+	if err := os.Mkdir(root, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
 	}
-	if err = db.Ping(); err != nil {
-		return nil, err
+	return &RequestFileStore{root: root}, nil
+}
+
+func (r *RequestFileStore) calcFilename(id string) string {
+	return filepath.Join(r.root, id)
+}
+
+func readFile(filename string) (Request, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return Request{}, err
 	}
-	r := &RequestDatabase{db: db}
-	if err = r.Init(); err != nil {
-		return nil, err
+
+	var req Request
+	err = yaml.Unmarshal(data, &req)
+	if err != nil {
+		return Request{}, err
 	}
-	return r, nil
+	return req, nil
 }
 
-func (r *RequestDatabase) Close() error {
-	return r.db.Close()
-}
-
-func (r *RequestDatabase) Init() error {
-	_, err := r.db.Exec(`
-		CREATE TABLE IF NOT EXISTS requests (
-			id TEXT PRIMARY KEY,
-			name TEXT,
-			method TEXT,
-			url TEXT,
-			body TEXT,
-			params TEXT,
-			headers TEXT,
-			auth TEXT
-		)
-	`)
-	return err
-}
-
-func (r *RequestDatabase) CreateRequest(req Request) error {
-	dao, err := fromRequest(req)
+func (r *RequestFileStore) CreateRequest(req Request) error {
+	data, err := yaml.Marshal(req)
 	if err != nil {
 		return err
 	}
-	_, err = r.db.Exec(
-		"INSERT INTO requests (id, name, method, url, body, params, headers, auth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		dao.id, dao.Name, dao.Method, dao.URL, dao.Body, dao.Params, dao.Headers, dao.Auth,
-	)
-	return err
+	filename := r.calcFilename(req.id)
+	return os.WriteFile(filename, data, 0755)
 }
 
-func (r *RequestDatabase) GetRequest(id string) (Request, error) {
-	var dao requestDAO
-	err := r.db.QueryRow(
-		"SELECT id, name, method, url, body, params, headers, auth FROM requests WHERE id = ?",
-		id,
-	).Scan(&dao.id, &dao.Name, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth)
-	if err != nil {
-		return Request{}, err
-	}
-	return dao.toRequest()
+func (r *RequestFileStore) GetRequest(id string) (Request, error) {
+	filename := r.calcFilename(id)
+	return readFile(filename)
 }
 
-func (r *RequestDatabase) ListRequests() ([]Request, error) {
-	rows, err := r.db.Query("SELECT id, name, method, url, body, params, headers, auth FROM requests")
+func (r *RequestFileStore) ListRequests() ([]Request, error) {
+	entries, err := os.ReadDir(r.root)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var requests []Request
-	for rows.Next() {
-		var dao requestDAO
-		if err := rows.Scan(&dao.id, &dao.Name, &dao.Method, &dao.URL, &dao.Body, &dao.Params, &dao.Headers, &dao.Auth); err != nil {
-			return nil, err
-		}
-		req, err := dao.toRequest()
+
+	read := func(filename string, wg *sync.WaitGroup, ch chan<- Request, ech chan<- error) {
+		defer wg.Done()
+		req, err := readFile(filename)
 		if err != nil {
-			return nil, err
+			ech <- err
+		} else {
+			ch <- req
 		}
-		requests = append(requests, req)
 	}
-	return requests, nil
+
+	var wg sync.WaitGroup
+	ch := make(chan Request)
+	ech := make(chan error)
+	for _, e := range entries {
+		wg.Add(1)
+		filename := filepath.Join(r.root, e.Name())
+		go read(filename, &wg, ch, ech)
+	}
+
+	go func() {
+		wg.Wait()
+		close(ch)
+		close(ech)
+	}()
+
+	for err := range ech {
+		return nil, err
+	}
+
+	var reqs []Request
+	for req := range ch {
+		reqs = append(reqs, req)
+	}
+	return reqs, nil
 }
 
-func (r *RequestDatabase) UpdateRequest(req Request) error {
-	dao, err := fromRequest(req)
-	if err != nil {
-		return err
-	}
-	_, err = r.db.Exec(
-		"UPDATE requests SET name = ?, method = ?, url = ?, body = ?, params = ?, headers = ?, auth = ? WHERE id = ?",
-		dao.Name, dao.Method, dao.URL, dao.Body, dao.Params, dao.Headers, dao.Auth, dao.id,
-	)
-	return err
+func (r *RequestFileStore) UpdateRequest(req Request) error {
+	return r.CreateRequest(req)
 }
 
-func (r *RequestDatabase) DeleteRequest(id string) error {
-	_, err := r.db.Exec("DELETE FROM requests WHERE id = ?", id)
-	return err
+func (r *RequestFileStore) DeleteRequest(id string) error {
+	filename := r.calcFilename(id)
+	return os.Remove(filename)
 }

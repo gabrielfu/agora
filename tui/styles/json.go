@@ -37,3 +37,7 @@ func ColorizeJsonIfValid(s string) string {
 func MinifyJson(s string) string {
 	return string(pretty.Ugly([]byte(s)))
 }
+
+func MinifyJsonBytes(b []byte) []byte {
+  return pretty.Ugly(b)
+}

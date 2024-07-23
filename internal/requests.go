@@ -12,8 +12,8 @@ import (
 )
 
 type KVPair struct {
-	Key   string `json:"k"`
-	Value string `json:"v"`
+	Key   string `json:"k" yaml:"key"`
+	Value string `json:"v" yaml:"value"`
 }
 
 type KVPairs []KVPair
@@ -46,15 +46,15 @@ func (kvs KVPairs) Remove(key, value string) KVPairs {
 }
 
 type Request struct {
-	id     string
-	Name   string
-	Method string
-	URL    string
-	Body   any // only supports json body for now
+	id     string `yaml:"id"`
+	Name   string `yaml:"name"`
+	Method string `yaml:"method"`
+	URL    string `yaml:"url"`
+	Body   []byte `yaml:"body"` // only supports json body for now
 	// we use array of kv pair to preserve order
-	Params  KVPairs
-	Headers KVPairs
-	Auth    string
+	Params  KVPairs `yaml:"params"`
+	Headers KVPairs `yaml:"headers"`
+	Auth    string  `yaml:"auth"`
 }
 
 // NewRequest creates a new request with a random id.
@@ -84,11 +84,8 @@ func (r *Request) WithName(name string) *Request {
 	return r
 }
 
-func (r *Request) WithBody(body any) *Request {
-	switch body.(type) {
-	case string, []byte:
-		body = styles.MinifyJson(body.(string))
-	}
+func (r *Request) WithBody(body []byte) *Request {
+	body = styles.MinifyJsonBytes(body)
 	r.Body = body
 	return r
 }

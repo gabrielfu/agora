@@ -52,7 +52,7 @@ func updateHeaderCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
 
 var updateBodyCmdFunc dialogs.TextAreaCmdFunc = func(body string) tea.Cmd {
 	return messages.UpdateRequestCmd(func(r *internal.Request) {
-		r.Body = body
+		r.Body = []byte(body)
 	})
 }
 
@@ -235,7 +235,7 @@ func (m *RequestPaneModel) handleUpdateBody() {
 		return
 	}
 	request := m.rctx.Request()
-	body := request.Body.(string)
+	body := string(request.Body)
 	m.textAreaDialog.SetCmdFunc(updateBodyCmdFunc)
 	m.textAreaDialog.SetValue(body)
 	m.textAreaDialog.Focus()
@@ -244,7 +244,7 @@ func (m *RequestPaneModel) handleUpdateBody() {
 
 func (m *RequestPaneModel) handleDeleteBody() tea.Cmd {
 	return messages.UpdateRequestCmd(func(r *internal.Request) {
-		r.Body = ""
+		r.Body = []byte{}
 	})
 }
 
