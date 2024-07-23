@@ -182,7 +182,7 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 			}
 		case "d":
 			if !m.rctx.Empty() {
-				return m, messages.DeleteRequestCmd(m.rctx.Request().ID())
+				return m, messages.DeleteRequestCmd(m.rctx.Request().ID)
 			}
 		}
 	}

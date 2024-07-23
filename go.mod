@@ -6,13 +6,13 @@ require (
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.26.4
 	github.com/charmbracelet/lipgloss v0.11.0
-	github.com/mattn/go-sqlite3 v1.14.22
 )
 
 require (
 	github.com/elliotchance/orderedmap/v2 v2.2.0
 	github.com/matoous/go-nanoid/v2 v2.1.0
 	github.com/tidwall/pretty v1.2.1
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

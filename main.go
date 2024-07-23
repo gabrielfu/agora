@@ -15,19 +15,13 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	dir := filepath.Join(home, ".agora")
-	if err := os.Mkdir(dir, 0755); err != nil && !os.IsExist(err) {
-		return err
-	}
-
-	dbFile := filepath.Join(dir, "data.sqlite")
-	db, err := internal.NewRquestDatabase(dbFile)
+	dir := filepath.Join(home, ".agora", "data")
+	store, err := internal.NewRquestFileStore(dir)
 	if err != nil {
-		return fmt.Errorf("error connecting to database: %v", err)
+		return fmt.Errorf("error initializing file store: %v", err)
 	}
-	defer db.Close()
 
-	model := tui.NewRootModel(db, tui.WithCollectionPaneWidth(0.33))
+	model := tui.NewRootModel(store, tui.WithCollectionPaneWidth(0.33))
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err = program.Run()
 	return err

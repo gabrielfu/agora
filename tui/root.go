@@ -15,7 +15,7 @@ import (
 
 // RootModel implements tea.RootModel interface
 type RootModel struct {
-	db *internal.RequestDatabase
+	store *internal.RequestFileStore
 
 	collectionPane panes.CollectionPaneModel
 	urlPane        panes.UrlPaneModel
@@ -41,11 +41,11 @@ func WithCollectionPaneWidth(width float32) Options {
 	}
 }
 
-func NewRootModel(db *internal.RequestDatabase, opts ...Options) *RootModel {
+func NewRootModel(store *internal.RequestFileStore, opts ...Options) *RootModel {
 	rctx := states.NewRequestContext()
 	dctx := states.NewDialogContext()
 	m := &RootModel{
-		db:             db,
+		store:          store,
 		collectionPane: panes.NewCollectionPaneModel(rctx, dctx),
 		urlPane:        panes.NewUrlPaneModel(rctx, dctx),
 		requestPane:    panes.NewRequestPaneModel(rctx, dctx),
@@ -135,11 +135,11 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.UpdateRequestMsg:
 		req := m.rctx.Request().Copy()
 		msg.Func(&req)
-		m.db.UpdateRequest(req)
+		m.store.UpdateRequest(req)
 	case messages.CreateRequestMsg:
-		m.db.CreateRequest(msg.Req)
+		m.store.CreateRequest(msg.Req)
 	case messages.DeleteRequestMsg:
-		m.db.DeleteRequest(msg.ID)
+		m.store.DeleteRequest(msg.ID)
 		m.rctx.Clear()
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -213,7 +213,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	// Set requests for collection pane
-	reqs, err := m.db.ListRequests()
+	reqs, err := m.store.ListRequests()
 	if err != nil {
 		return m, tea.Quit
 	}

@@ -12,8 +12,8 @@ import (
 )
 
 type KVPair struct {
-	Key   string `json:"k"`
-	Value string `json:"v"`
+	Key   string `json:"k" yaml:"key"`
+	Value string `json:"v" yaml:"value"`
 }
 
 type KVPairs []KVPair
@@ -46,21 +46,21 @@ func (kvs KVPairs) Remove(key, value string) KVPairs {
 }
 
 type Request struct {
-	id     string
-	Name   string
-	Method string
-	URL    string
-	Body   any // only supports json body for now
+	ID     string `yaml:"id"`
+	Name   string `yaml:"name"`
+	Method string `yaml:"method"`
+	URL    string `yaml:"url"`
+	Body   []byte `yaml:"body"` // only supports json body for now
 	// we use array of kv pair to preserve order
-	Params  KVPairs
-	Headers KVPairs
-	Auth    string
+	Params  KVPairs `yaml:"params"`
+	Headers KVPairs `yaml:"headers"`
+	Auth    string  `yaml:"auth"`
 }
 
 // NewRequest creates a new request with a random id.
 func NewRequest(method, url string) *Request {
 	return &Request{
-		id:     RandomID(),
+		ID:     RandomID(),
 		Method: method,
 		URL:    url,
 	}
@@ -68,7 +68,7 @@ func NewRequest(method, url string) *Request {
 
 func (r Request) Copy() Request {
 	return Request{
-		id:      r.id,
+		ID:      r.ID,
 		Name:    r.Name,
 		Method:  r.Method,
 		URL:     r.URL,
@@ -84,11 +84,8 @@ func (r *Request) WithName(name string) *Request {
 	return r
 }
 
-func (r *Request) WithBody(body any) *Request {
-	switch body.(type) {
-	case string, []byte:
-		body = styles.MinifyJson(body.(string))
-	}
+func (r *Request) WithBody(body []byte) *Request {
+	body = styles.MinifyJsonBytes(body)
 	r.Body = body
 	return r
 }
@@ -118,14 +115,10 @@ func (r *Request) WithAuth(auth string) *Request {
 	return r
 }
 
-func (r *Request) ID() string {
-	return r.id
-}
-
 func (r Request) String() string {
 	return fmt.Sprintf(
 		"Request(ID=%s, Name=%s, Method=%s, URL=%s, Body=%v, Params=%v, Headers=%v, Auth=%s}",
-		r.id, r.Name, r.Method, r.URL, r.Body, r.Params, r.Headers, r.Auth,
+		r.ID, r.Name, r.Method, r.URL, r.Body, r.Params, r.Headers, r.Auth,
 	)
 }
 
@@ -137,13 +130,10 @@ func (r *Request) RemoveHeader(key, value string) {
 	r.Headers = r.Headers.Remove(key, value)
 }
 
-func makeJsonBodyReader(body any) (io.Reader, error) {
+func makeJsonBodyReader(body []byte) (io.Reader, error) {
 	// todo: support other body dtype and content type
-	switch body.(type) {
-	case string, []byte:
-		body = styles.MinifyJson(body.(string))
-	}
-	marshalled, err := json.Marshal(body)
+	body = styles.MinifyJsonBytes(body)
+	marshalled, err := json.Marshal(string(body))
 	if err != nil {
 		return nil, fmt.Errorf("body is not a valid json: %w", err)
 	}
