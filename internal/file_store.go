@@ -3,6 +3,7 @@ package internal
 import (
 	"os"
 	"path/filepath"
+	"sync"
 
 	"gopkg.in/yaml.v3"
 )
@@ -56,14 +57,28 @@ func (r *RequestFileStore) ListRequests() ([]Request, error) {
 		return nil, err
 	}
 
-	var reqs []Request
-	for _, e := range entries {
-		filename := filepath.Join(r.root, e.Name())
-		req, err := readFile(filename)
+	var wg sync.WaitGroup
+	reqs := make([]Request, len(entries))
+	errs := make([]error, len(entries))
+	for i, e := range entries {
+		wg.Add(1)
+		go func(i int, e os.DirEntry) {
+			defer wg.Done()
+			filename := filepath.Join(r.root, e.Name())
+			req, err := readFile(filename)
+			if err != nil {
+				errs[i] = err
+				return
+			}
+			reqs[i] = req
+		}(i, e)
+	}
+	wg.Wait()
+
+	for _, err := range errs {
 		if err != nil {
 			return nil, err
 		}
-		reqs = append(reqs, req)
 	}
 	return reqs, nil
 }
