@@ -268,7 +268,7 @@ func (m *RequestPaneModel) Refresh() {
 		}
 		m.list.SetItems(items)
 	case requestBodyTab:
-		body := fmt.Sprintf("%v", m.rctx.Request().Body)
+		body := string(m.rctx.Request().Body)
 		body = styles.ColorizeJsonIfValid(body)
 		m.viewport.SetContent(body)
 	default:
