@@ -23,4 +23,7 @@ var (
 	DeleteRequestCmd = func(id string) tea.Cmd {
 		return func() tea.Msg { return DeleteRequestMsg{ID: id} }
 	}
+	CopyRequestCmd = func(r internal.Request) tea.Cmd {
+		return func() tea.Msg { return CopyRequestMsg{Req: r} }
+	}
 )

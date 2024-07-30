@@ -184,6 +184,10 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 			if !m.rctx.Empty() {
 				return m, messages.DeleteRequestCmd(m.rctx.Request().ID)
 			}
+		case "c":
+			if !m.rctx.Empty() {
+				return m, messages.CopyRequestCmd(*m.rctx.Request())
+			}
 		}
 	}
 

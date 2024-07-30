@@ -79,6 +79,12 @@ func (r Request) Copy() Request {
 	}
 }
 
+func (r Request) CopyWithNewID() Request {
+	newReq := r.Copy()
+	newReq.ID = RandomID()
+	return newReq
+}
+
 func (r *Request) WithName(name string) *Request {
 	r.Name = name
 	return r

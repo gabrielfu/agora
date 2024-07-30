@@ -141,6 +141,9 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.DeleteRequestMsg:
 		m.store.DeleteRequest(msg.ID)
 		m.rctx.Clear()
+	case messages.CopyRequestMsg:
+		newReq := msg.Req.CopyWithNewID()
+		m.store.CreateRequest(newReq)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
