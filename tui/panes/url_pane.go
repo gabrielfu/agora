@@ -90,28 +90,25 @@ func (m UrlPaneModel) Update(msg tea.Msg) (UrlPaneModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "x":
-			if !m.rctx.Empty() {
+		case "esc":
+			return m, messages.SetFocusCmd(views.CollectionPaneView)
+		}
+
+		if !m.rctx.Empty() {
+			switch msg.String() {
+			case "x":
 				return m, messages.ExecuteRequestCmd
-			}
-		case "m":
-			if !m.rctx.Empty() {
+			case "m":
 				m.dctx.SetDialog(&m.selectMethodDialog)
-			}
-		case "enter":
-			if !m.rctx.Empty() {
+			case "enter":
 				m.editUrlDialog.SetValue(m.rctx.Request().URL)
 				m.editUrlDialog.Focus()
 				m.dctx.SetDialog(&m.editUrlDialog)
-			}
-		case "r":
-			if !m.rctx.Empty() {
+			case "r":
 				m.editNameDialog.SetValue(m.rctx.Request().Name)
 				m.editNameDialog.Focus()
 				m.dctx.SetDialog(&m.editNameDialog)
 			}
-		case "esc":
-			return m, messages.SetFocusCmd(views.CollectionPaneView)
 		}
 	}
 	return m, nil

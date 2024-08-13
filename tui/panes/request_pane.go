@@ -285,42 +285,45 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	case tea.KeyMsg:
 		if m.dctx.Empty() {
 			switch msg.String() {
-			case "x":
-				if !m.rctx.Empty() {
-					return m, messages.ExecuteRequestCmd
-				}
 			case "esc":
 				return m, messages.SetFocusCmd(views.CollectionPaneView)
 			case "[", "shift+tab":
 				m.switchTab(-1)
 			case "]", "tab":
 				m.switchTab(1)
-			case "enter":
-				switch m.tab {
-				case requestParamsTab:
-					m.handleUpdateParam()
-				case requestHeadersTab:
-					m.handleUpdateHeader()
-				case requestBodyTab:
-					m.handleUpdateBody()
-				}
-			case "n":
-				switch m.tab {
-				case requestParamsTab:
-					m.handleNewParam()
-				case requestHeadersTab:
-					m.handleNewHeader()
-				case requestBodyTab:
-					m.handleUpdateBody()
-				}
-			case "d":
-				switch m.tab {
-				case requestParamsTab:
-					cmds = append(cmds, m.handleDeleteParam())
-				case requestHeadersTab:
-					cmds = append(cmds, m.handleDeleteHeader())
-				case requestBodyTab:
-					cmds = append(cmds, m.handleDeleteBody())
+			}
+
+			if !m.rctx.Empty() {
+				switch msg.String() {
+				case "x":
+					return m, messages.ExecuteRequestCmd
+				case "enter":
+					switch m.tab {
+					case requestParamsTab:
+						m.handleUpdateParam()
+					case requestHeadersTab:
+						m.handleUpdateHeader()
+					case requestBodyTab:
+						m.handleUpdateBody()
+					}
+				case "n":
+					switch m.tab {
+					case requestParamsTab:
+						m.handleNewParam()
+					case requestHeadersTab:
+						m.handleNewHeader()
+					case requestBodyTab:
+						m.handleUpdateBody()
+					}
+				case "d":
+					switch m.tab {
+					case requestParamsTab:
+						cmds = append(cmds, m.handleDeleteParam())
+					case requestHeadersTab:
+						cmds = append(cmds, m.handleDeleteHeader())
+					case requestBodyTab:
+						cmds = append(cmds, m.handleDeleteBody())
+					}
 				}
 			}
 		}
