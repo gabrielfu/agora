@@ -15,7 +15,7 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	dir := filepath.Join(home, ".agora", "data")
+	dir := filepath.Join(home, ".agora", "data", "requests")
 	store, err := internal.NewRquestFileStore(dir)
 	if err != nil {
 		return fmt.Errorf("error initializing file store: %v", err)
