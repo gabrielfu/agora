@@ -42,6 +42,7 @@ func NewCollectionListPaneModel(dctx *states.DialogContext) CollectionListPaneMo
 	l.SetFilteringEnabled(false)
 	l.SetShowHelp(false)
 	l.SetShowFilter(false)
+	l.SetShowPagination(false)
 
 	return CollectionListPaneModel{
 		dctx:         dctx,
@@ -63,12 +64,14 @@ func (m *CollectionListPaneModel) refreshItemDelegate() {
 
 func (m *CollectionListPaneModel) SetWidth(width int) {
 	m.width = width
+	m.list.SetWidth(m.width - 2)
 	m.itemDelegate.Width = width - 2
 	m.refreshItemDelegate()
 }
 
 func (m *CollectionListPaneModel) SetHeight(height int) {
 	m.height = height
+	m.list.SetHeight(height)
 }
 
 func (m *CollectionListPaneModel) SetBorderColor(color string) {
@@ -76,7 +79,7 @@ func (m *CollectionListPaneModel) SetBorderColor(color string) {
 }
 
 func (m CollectionListPaneModel) footer() string {
-	cursor := m.list.Cursor() + 1
+	cursor := m.list.Index() + 1
 	total := len(m.list.Items())
 	cursorString := " -"
 	if cursor <= total {
@@ -171,8 +174,6 @@ func (m CollectionListPaneModel) Update(msg tea.Msg) (CollectionListPaneModel, t
 		case "d":
 			cmds = append(cmds, m.handleDeleteCollection())
 		}
-	case tea.WindowSizeMsg:
-		m.list.SetSize(m.width-2, m.height-3)
 	}
 
 	m.list, cmd = m.list.Update(msg)
