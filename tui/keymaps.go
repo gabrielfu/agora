@@ -11,6 +11,7 @@ func NewKeymap() *Keymap {
 var (
 	EmptyKeymap              = NewKeymap()
 	CollectionPaneKeymap     = NewKeymap()
+	CollectionListPaneKeymap = NewKeymap()
 	UrlPaneKeymap            = NewKeymap()
 	RequestPaneKeymap        = NewKeymap()
 	ResponsePaneKeymap       = NewKeymap()
@@ -26,6 +27,11 @@ func init() {
 	CollectionPaneKeymap.Set("r", "Rename")
 	CollectionPaneKeymap.Set("d", "Delete")
 	CollectionPaneKeymap.Set("c", "Copy")
+
+	CollectionListPaneKeymap.Set("<enter>", "Select")
+	CollectionListPaneKeymap.Set("n", "New")
+	CollectionListPaneKeymap.Set("r", "Rename")
+	CollectionListPaneKeymap.Set("d", "Delete")
 
 	UrlPaneKeymap.Set("x", "Execute")
 	UrlPaneKeymap.Set("m", "Select method")

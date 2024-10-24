@@ -35,6 +35,8 @@ func (m *NagivationModel) updateNagivationContent() {
 	switch m.focus {
 	case views.CollectionPaneView:
 		keymap = CollectionPaneKeymap
+	case views.CollectionListPaneView:
+		keymap = CollectionListPaneKeymap
 	case views.UrlPaneView:
 		keymap = UrlPaneKeymap
 	case views.RequestPaneView:
