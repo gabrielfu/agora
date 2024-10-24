@@ -88,7 +88,11 @@ func (m *RootModel) SetCollection(collection string) {
 	}
 	m.collectionStore.SetCurrentCollection(collection)
 	dir := m.collectionStore.CurrentCollectionRequestDir()
-	m.requestStore = internal.NewRequestFileStore(dir)
+	requestStore, err := internal.NewRequestFileStore(dir)
+	if err != nil {
+		panic(fmt.Sprintf("error initializing collection store: %v", err))
+	}
+	m.requestStore = requestStore
 	m.collectionPane.SetCollection(collection)
 }
 
@@ -176,6 +180,20 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.SetCollectionMsg:
 		m.SetCollection(msg.Collection)
 		m.rctx.Clear()
+	case messages.CreateCollectionMsg:
+		m.SetCollection(msg.Collection)
+		m.rctx.Clear()
+	case messages.UpdateCollectionMsg:
+		m.collectionStore.RenameCollection(msg.OldName, msg.NewName)
+		if m.collectionStore.CurrentCollection() == msg.OldName {
+			m.collectionStore.SetCurrentCollection(msg.NewName)
+		}
+	case messages.DeleteCollectionMsg:
+		m.collectionStore.DeleteCollection(msg.Collection)
+		if m.collectionStore.CurrentCollection() == msg.Collection {
+			collection, _ := m.collectionStore.GetFirstCollection()
+			m.SetCollection(collection)
+		}
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":

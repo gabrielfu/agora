@@ -13,8 +13,11 @@ type RequestFileStore struct {
 	root string
 }
 
-func NewRequestFileStore(root string) *RequestFileStore {
-	return &RequestFileStore{root: root}
+func NewRequestFileStore(root string) (*RequestFileStore, error) {
+	if err := os.MkdirAll(root, 0755); err != nil && !os.IsExist(err) {
+		return nil, err
+	}
+	return &RequestFileStore{root: root}, nil
 }
 
 func (r *RequestFileStore) calcFilename(id string) string {

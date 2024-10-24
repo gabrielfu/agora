@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -44,6 +45,18 @@ func (c *CollectionStore) Root() string {
 
 func (c *CollectionStore) SetRoot(dir string) {
 	c.root = dir
+}
+
+func (c *CollectionStore) GetFirstCollection() (string, error) {
+	collectionsDir := filepath.Join(c.Root(), "collections")
+	entries, err := os.ReadDir(collectionsDir)
+	if err != nil {
+		return "", err
+	}
+	for _, entry := range entries {
+		return entry.Name(), nil
+	}
+	return "", fmt.Errorf("no collections found")
 }
 
 func (c *CollectionStore) ListCollections() ([]string, error) {
