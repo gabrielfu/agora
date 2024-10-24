@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/a70e0878-d1b4-4977-8043-249830afb623
 
 #### Binary Release
 
-For Windows, MacOS and Linux, you can ownload from [GitHub release page](https://github.com/gabrielfu/agora/releases)
+For Windows, MacOS and Linux, you can download from [GitHub release page](https://github.com/gabrielfu/agora/releases)
 
 #### Install from Source
 
