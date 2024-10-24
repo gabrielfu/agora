@@ -30,7 +30,3 @@ type DeleteRequestMsg struct {
 type CopyRequestMsg struct {
 	Req internal.Request
 }
-
-type SetCollectionMsg struct {
-	Collection string
-}

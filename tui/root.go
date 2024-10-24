@@ -1,8 +1,6 @@
 package tui
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -69,17 +67,6 @@ func (m RootModel) Init() tea.Cmd {
 		textinput.Blink,
 		messages.SetFocusCmd(views.CollectionPaneView),
 	)
-}
-
-func (m *RootModel) SetCollection(collection string) {
-	collectionStore := internal.DefaultCollectionStore
-	collectionStore.SetCollection(collection)
-	dir := collectionStore.CollectionRequestDir()
-	store, err := internal.NewRequestFileStore(dir)
-	if err != nil {
-		panic(fmt.Sprintf("error initializing file store: %v", err))
-	}
-	m.store = store
 }
 
 func (m *RootModel) setFocus(v views.View) {
@@ -157,9 +144,6 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.CopyRequestMsg:
 		newReq := msg.Req.CopyWithNewID()
 		m.store.CreateRequest(newReq)
-	case messages.SetCollectionMsg:
-		m.SetCollection(msg.Collection)
-		m.rctx.Clear()
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":

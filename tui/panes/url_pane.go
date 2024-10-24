@@ -72,7 +72,7 @@ func (m *UrlPaneModel) SetBorderColor(color string) {
 func (m UrlPaneModel) generateStyle() lipgloss.Style {
 	title := []string{"[2]", "URL"}
 	if !m.rctx.Empty() && m.rctx.Request().Name != "" {
-		title = append(title, "("+m.rctx.Request().Name+")")
+		title = append(title, "", "", "("+m.rctx.Request().Name+")")
 	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
