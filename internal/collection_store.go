@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 )
 
+const DEFAULT_COLLECTION_NAME = "default"
+
 // default: ~/.agora
 func defaultRootDir() (string, error) {
 	home, err := os.UserHomeDir()
@@ -15,7 +17,8 @@ func defaultRootDir() (string, error) {
 }
 
 type CollectionStore struct {
-	root string
+	root       string
+	collection string
 }
 
 func (c *CollectionStore) Root() string {
@@ -35,12 +38,22 @@ func (c *CollectionStore) SetDefaultRoot() error {
 	return nil
 }
 
-func (c *CollectionStore) CollectionDir(collection string) string {
-	return filepath.Join(c.Root(), "collections", collection)
+func (c *CollectionStore) Collection() string {
+	return c.collection
 }
 
-func (c *CollectionStore) CollectionRequestDir(collection string) string {
-	return filepath.Join(c.CollectionDir(collection), "requests")
+func (c *CollectionStore) SetCollection(collection string) {
+	c.collection = collection
 }
 
-var DefaultCollectionStore = &CollectionStore{}
+func (c *CollectionStore) CollectionDir() string {
+	return filepath.Join(c.Root(), "collections", c.collection)
+}
+
+func (c *CollectionStore) CollectionRequestDir() string {
+	return filepath.Join(c.CollectionDir(), "requests")
+}
+
+var DefaultCollectionStore = &CollectionStore{
+	collection: DEFAULT_COLLECTION_NAME,
+}

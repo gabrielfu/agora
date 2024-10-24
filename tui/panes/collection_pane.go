@@ -133,10 +133,12 @@ func (m CollectionPaneModel) footer() string {
 }
 
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
+	collectionName := internal.DefaultCollectionStore.Collection()
+	title := []string{"[1]", "Collection", "(" + collectionName + ")"}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
 		styles.GenerateBorderOption{
-			Title:  []string{"[1]", "Collection"},
+			Title:  title,
 			Footer: []string{m.footer()},
 		},
 		m.width,

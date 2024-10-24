@@ -26,4 +26,7 @@ var (
 	CopyRequestCmd = func(r internal.Request) tea.Cmd {
 		return func() tea.Msg { return CopyRequestMsg{Req: r} }
 	}
+	SetCollectionCmd = func(c string) tea.Cmd {
+		return func() tea.Msg { return SetCollectionMsg{Collection: c} }
+	}
 )

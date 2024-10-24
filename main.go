@@ -14,7 +14,7 @@ func Run() error {
 	if err := collectionStore.SetDefaultRoot(); err != nil {
 		return err
 	}
-	dir := collectionStore.CollectionRequestDir("default")
+	dir := collectionStore.CollectionRequestDir()
 	store, err := internal.NewRequestFileStore(dir)
 	if err != nil {
 		return fmt.Errorf("error initializing file store: %v", err)
