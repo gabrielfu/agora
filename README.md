@@ -19,4 +19,5 @@ Then, you can launch Agora with the command `agora`.
 - [ ] Response history
 - [ ] Authentication helper
 - [ ] Environments
-- [ ] Request Timeout
+- [ ] Request timeout
+- [ ] File upload
