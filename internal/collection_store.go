@@ -23,10 +23,23 @@ type CollectionStore struct {
 }
 
 func NewCollectionStore(root string) (*CollectionStore, error) {
-	// handles case where default collection was renamed by user
-	c := &CollectionStore{root: root, currentCollection: DEFAULT_COLLECTION_NAME}
-	if err := c.CreateCollection(c.currentCollection); err != nil && !os.IsExist(err) {
+	collectionsDir := filepath.Join(root, "collections")
+	if err := os.MkdirAll(collectionsDir, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
+	}
+
+	c := &CollectionStore{root: root}
+	collections, err := c.ListCollections()
+	if err != nil {
+		return nil, err
+	}
+	if len(collections) > 0 {
+		c.currentCollection = collections[0]
+	} else {
+		if err := c.CreateCollection(c.currentCollection); err != nil && !os.IsExist(err) {
+			return nil, err
+		}
+		c.currentCollection = DEFAULT_COLLECTION_NAME
 	}
 	return c, nil
 }

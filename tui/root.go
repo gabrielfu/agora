@@ -187,12 +187,18 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.collectionStore.RenameCollection(msg.OldName, msg.NewName)
 		if m.collectionStore.CurrentCollection() == msg.OldName {
 			m.collectionStore.SetCurrentCollection(msg.NewName)
+			dir := m.collectionStore.CurrentCollectionRequestDir()
+			requestStore, _ := internal.NewRequestFileStore(dir)
+			m.requestStore = requestStore
 		}
 	case messages.DeleteCollectionMsg:
-		m.collectionStore.DeleteCollection(msg.Collection)
-		if m.collectionStore.CurrentCollection() == msg.Collection {
-			collection, _ := m.collectionStore.GetFirstCollection()
-			m.SetCollection(collection)
+		collections, _ := m.collectionStore.ListCollections()
+		if len(collections) > 1 {
+			m.collectionStore.DeleteCollection(msg.Collection)
+			if m.collectionStore.CurrentCollection() == msg.Collection {
+				collection, _ := m.collectionStore.GetFirstCollection()
+				m.SetCollection(collection)
+			}
 		}
 	case tea.KeyMsg:
 		switch msg.String() {
