@@ -3,25 +3,27 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gabrielfu/agora/internal"
 	"github.com/gabrielfu/agora/tui"
 )
 
-func Run() error {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	dir := filepath.Join(home, ".agora", "data", "requests")
-	store, err := internal.NewRquestFileStore(dir)
-	if err != nil {
-		return fmt.Errorf("error initializing file store: %v", err)
-	}
+const DEFAULT_COLLECTION_NAME = "default"
 
-	model := tui.NewRootModel(store, tui.WithCollectionPaneWidth(0.33))
+func Run() error {
+	rootStore, err := internal.NewDefaultRootStore()
+	if err != nil {
+		return fmt.Errorf("error initializing root store: %v", err)
+	}
+	// TODO: handled renamed collection
+	if !rootStore.CollectionExists(DEFAULT_COLLECTION_NAME) {
+		if err = rootStore.CreateCollection(DEFAULT_COLLECTION_NAME); err != nil {
+			return fmt.Errorf("error creating default collection: %v", err)
+		}
+	}
+	requestStore := internal.NewRequestFileStore(rootStore)
+	model := tui.NewRootModel(requestStore, tui.WithCollectionPaneWidth(0.33))
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err = program.Run()
 	return err

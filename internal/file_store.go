@@ -8,19 +8,23 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const REQUEST_FOLDER_NAME = "requests"
+
+type CollectionRequest struct {
+	Collection string
+	Request    Request
+}
+
 type RequestFileStore struct {
-	root string
+	rootStore *RootStore
 }
 
-func NewRquestFileStore(root string) (*RequestFileStore, error) {
-	if err := os.MkdirAll(root, 0755); err != nil && !os.IsExist(err) {
-		return nil, err
-	}
-	return &RequestFileStore{root: root}, nil
+func NewRequestFileStore(rootStore *RootStore) *RequestFileStore {
+	return &RequestFileStore{rootStore: rootStore}
 }
 
-func (r *RequestFileStore) calcFilename(id string) string {
-	return filepath.Join(r.root, id)
+func (r *RequestFileStore) calcFilename(collection, id string) string {
+	return filepath.Join(r.rootStore.CollectionDir(collection), REQUEST_FOLDER_NAME, id)
 }
 
 func readFile(filename string) (Request, error) {
@@ -37,57 +41,67 @@ func readFile(filename string) (Request, error) {
 	return req, nil
 }
 
-func (r *RequestFileStore) CreateRequest(req Request) error {
+func (r *RequestFileStore) CreateRequest(collection string, req Request) error {
 	data, err := yaml.Marshal(req)
 	if err != nil {
 		return err
 	}
-	filename := r.calcFilename(req.ID)
+	filename := r.calcFilename(collection, req.ID)
 	return os.WriteFile(filename, data, 0755)
 }
 
-func (r *RequestFileStore) GetRequest(id string) (Request, error) {
-	filename := r.calcFilename(id)
+func (r *RequestFileStore) GetRequest(collection, id string) (Request, error) {
+	filename := r.calcFilename(collection, id)
 	return readFile(filename)
 }
 
-func (r *RequestFileStore) ListRequests() ([]Request, error) {
-	entries, err := os.ReadDir(r.root)
+func (r *RequestFileStore) ListRequests() ([]CollectionRequest, error) {
+	collections, err := r.rootStore.ListCollections()
 	if err != nil {
 		return nil, err
 	}
 
-	var wg sync.WaitGroup
-	reqs := make([]Request, len(entries))
-	errs := make([]error, len(entries))
-	for i, e := range entries {
-		wg.Add(1)
-		go func(i int, e os.DirEntry) {
-			defer wg.Done()
-			filename := filepath.Join(r.root, e.Name())
-			req, err := readFile(filename)
-			if err != nil {
-				errs[i] = err
-				return
-			}
-			reqs[i] = req
-		}(i, e)
-	}
-	wg.Wait()
-
-	for _, err := range errs {
+	var collectionEntries []CollectionRequest
+	for _, collection := range collections {
+		collectionDir := r.rootStore.CollectionDir(collection)
+		entries, err := os.ReadDir(collectionDir)
 		if err != nil {
 			return nil, err
 		}
+
+		var wg sync.WaitGroup
+		reqs := make([]CollectionRequest, len(entries))
+		errs := make([]error, len(entries))
+		for i, e := range entries {
+			wg.Add(1)
+			go func(i int, e os.DirEntry) {
+				defer wg.Done()
+				filename := filepath.Join(collectionDir, e.Name())
+				req, err := readFile(filename)
+				if err != nil {
+					errs[i] = err
+					return
+				}
+				reqs[i] = CollectionRequest{Collection: collection, Request: req}
+			}(i, e)
+		}
+		wg.Wait()
+
+		for _, err := range errs {
+			if err != nil {
+				return nil, err
+			}
+		}
+		collectionEntries = append(collectionEntries, reqs...)
 	}
-	return reqs, nil
+	return collectionEntries, nil
 }
 
-func (r *RequestFileStore) UpdateRequest(req Request) error {
-	return r.CreateRequest(req)
+func (r *RequestFileStore) UpdateRequest(collection string, req Request) error {
+	return r.CreateRequest(collection, req)
 }
 
-func (r *RequestFileStore) DeleteRequest(id string) error {
-	filename := r.calcFilename(id)
+func (r *RequestFileStore) DeleteRequest(collection, id string) error {
+	filename := r.calcFilename(collection, id)
 	return os.Remove(filename)
 }
