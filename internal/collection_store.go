@@ -17,8 +17,25 @@ func defaultRootDir() (string, error) {
 }
 
 type CollectionStore struct {
-	root       string
-	collection string
+	root              string
+	currentCollection string
+}
+
+func NewCollectionStore(root string) (*CollectionStore, error) {
+	// handles case where default collection was renamed by user
+	c := &CollectionStore{root: root, currentCollection: DEFAULT_COLLECTION_NAME}
+	if err := c.CreateCollection(c.currentCollection); err != nil && !os.IsExist(err) {
+		return nil, err
+	}
+	return c, nil
+}
+
+func NewDefaultCollectionStore() (*CollectionStore, error) {
+	dir, err := defaultRootDir()
+	if err != nil {
+		return nil, err
+	}
+	return NewCollectionStore(dir)
 }
 
 func (c *CollectionStore) Root() string {
@@ -29,31 +46,54 @@ func (c *CollectionStore) SetRoot(dir string) {
 	c.root = dir
 }
 
-func (c *CollectionStore) SetDefaultRoot() error {
-	dir, err := defaultRootDir()
+func (c *CollectionStore) ListCollections() ([]string, error) {
+	collectionsDir := filepath.Join(c.Root(), "collections")
+	entries, err := os.ReadDir(collectionsDir)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	c.SetRoot(dir)
-	return nil
+	var dirs []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			dirs = append(dirs, entry.Name())
+		}
+	}
+	return dirs, nil
 }
 
-func (c *CollectionStore) Collection() string {
-	return c.collection
+func (c *CollectionStore) CollectionDir(collection string) string {
+	return filepath.Join(c.Root(), "collections", collection)
 }
 
-func (c *CollectionStore) SetCollection(collection string) {
-	c.collection = collection
+func (c *CollectionStore) CollectionExists(collection string) bool {
+	_, err := os.Stat(filepath.Join(c.Root(), "collections", collection))
+	return err == nil
 }
 
-func (c *CollectionStore) CollectionDir() string {
-	return filepath.Join(c.Root(), "collections", c.collection)
+func (c *CollectionStore) CreateCollection(collection string) error {
+	return os.MkdirAll(c.CollectionDir(collection), 0755)
 }
 
-func (c *CollectionStore) CollectionRequestDir() string {
-	return filepath.Join(c.CollectionDir(), "requests")
+func (c *CollectionStore) DeleteCollection(collection string) error {
+	return os.RemoveAll(c.CollectionDir(collection))
 }
 
-var DefaultCollectionStore = &CollectionStore{
-	collection: DEFAULT_COLLECTION_NAME,
+func (c *CollectionStore) RenameCollection(oldName, newName string) error {
+	return os.Rename(c.CollectionDir(oldName), c.CollectionDir(newName))
+}
+
+func (c *CollectionStore) CurrentCollection() string {
+	return c.currentCollection
+}
+
+func (c *CollectionStore) SetCurrentCollection(collection string) {
+	c.currentCollection = collection
+}
+
+func (c *CollectionStore) CurrentCollectionDir() string {
+	return c.CollectionDir(c.currentCollection)
+}
+
+func (c *CollectionStore) CurrentCollectionRequestDir() string {
+	return filepath.Join(c.CurrentCollectionDir(), "requests")
 }

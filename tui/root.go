@@ -17,7 +17,8 @@ import (
 
 // RootModel implements tea.RootModel interface
 type RootModel struct {
-	store *internal.RequestFileStore
+	collectionStore *internal.CollectionStore
+	requestStore    *internal.RequestFileStore
 
 	collectionPane panes.CollectionPaneModel
 	urlPane        panes.UrlPaneModel
@@ -43,20 +44,25 @@ func WithCollectionPaneWidth(width float32) Options {
 	}
 }
 
-func NewRootModel(store *internal.RequestFileStore, opts ...Options) *RootModel {
+func NewRootModel(
+	collectionStore *internal.CollectionStore,
+	requestStore *internal.RequestFileStore,
+	opts ...Options,
+) *RootModel {
 	rctx := states.NewRequestContext()
 	dctx := states.NewDialogContext()
 	m := &RootModel{
-		store:          store,
-		collectionPane: panes.NewCollectionPaneModel(rctx, dctx),
-		urlPane:        panes.NewUrlPaneModel(rctx, dctx),
-		requestPane:    panes.NewRequestPaneModel(rctx, dctx),
-		responsePane:   panes.NewResponsePaneModel(rctx),
-		navigation:     NagivationModel{},
-		focus:          views.CollectionPaneView,
-		rctx:           rctx,
-		dctx:           dctx,
-		enoughSpace:    true,
+		collectionStore: collectionStore,
+		requestStore:    requestStore,
+		collectionPane:  panes.NewCollectionPaneModel(rctx, dctx, collectionStore.CurrentCollection()),
+		urlPane:         panes.NewUrlPaneModel(rctx, dctx),
+		requestPane:     panes.NewRequestPaneModel(rctx, dctx),
+		responsePane:    panes.NewResponsePaneModel(rctx),
+		navigation:      NagivationModel{},
+		focus:           views.CollectionPaneView,
+		rctx:            rctx,
+		dctx:            dctx,
+		enoughSpace:     true,
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -72,14 +78,16 @@ func (m RootModel) Init() tea.Cmd {
 }
 
 func (m *RootModel) SetCollection(collection string) {
-	collectionStore := internal.DefaultCollectionStore
-	collectionStore.SetCollection(collection)
-	dir := collectionStore.CollectionRequestDir()
-	store, err := internal.NewRequestFileStore(dir)
-	if err != nil {
-		panic(fmt.Sprintf("error initializing file store: %v", err))
+	if !m.collectionStore.CollectionExists(collection) {
+		err := m.collectionStore.CreateCollection(collection)
+		if err != nil {
+			panic(fmt.Sprintf("error creating collection: %v", err))
+		}
 	}
-	m.store = store
+	m.collectionStore.SetCurrentCollection(collection)
+	dir := m.collectionStore.CurrentCollectionRequestDir()
+	m.requestStore = internal.NewRequestFileStore(dir)
+	m.collectionPane.SetCollection(collection)
 }
 
 func (m *RootModel) setFocus(v views.View) {
@@ -148,15 +156,15 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case messages.UpdateRequestMsg:
 		req := m.rctx.Request().Copy()
 		msg.Func(&req)
-		m.store.UpdateRequest(req)
+		m.requestStore.UpdateRequest(req)
 	case messages.CreateRequestMsg:
-		m.store.CreateRequest(msg.Req)
+		m.requestStore.CreateRequest(msg.Req)
 	case messages.DeleteRequestMsg:
-		m.store.DeleteRequest(msg.ID)
+		m.requestStore.DeleteRequest(msg.ID)
 		m.rctx.Clear()
 	case messages.CopyRequestMsg:
 		newReq := msg.Req.CopyWithNewID()
-		m.store.CreateRequest(newReq)
+		m.requestStore.CreateRequest(newReq)
 	case messages.SetCollectionMsg:
 		m.SetCollection(msg.Collection)
 		m.rctx.Clear()
@@ -232,7 +240,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	// Set requests for collection pane
-	reqs, err := m.store.ListRequests()
+	reqs, err := m.requestStore.ListRequests()
 	if err != nil {
 		return m, tea.Quit
 	}

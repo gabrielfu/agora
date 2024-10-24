@@ -41,6 +41,7 @@ type CollectionPaneModel struct {
 	height      int
 	borderColor string
 
+	collection     string
 	requests       []internal.Request
 	table          table.Model
 	cursor         int
@@ -49,7 +50,7 @@ type CollectionPaneModel struct {
 	editNameDialog dialogs.TextInputDialog
 }
 
-func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) CollectionPaneModel {
+func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext, collection string) CollectionPaneModel {
 	t := table.New(
 		table.WithColumns(makeColumns(0)),
 		table.WithRows(make([]table.Row, 0)),
@@ -69,7 +70,11 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 	t.KeyMap.HalfPageUp.SetEnabled(false)
 	t.KeyMap.HalfPageDown.SetEnabled(false)
 
-	return CollectionPaneModel{table: t, rctx: rctx, dctx: dctx,
+	return CollectionPaneModel{
+		table:      t,
+		collection: collection,
+		rctx:       rctx,
+		dctx:       dctx,
 		editNameDialog: dialogs.NewTextInputDialog(
 			64,
 			[]string{"Name"},
@@ -100,6 +105,10 @@ func (m *CollectionPaneModel) SetHeight(height int) {
 
 func (m *CollectionPaneModel) SetBorderColor(color string) {
 	m.borderColor = color
+}
+
+func (m *CollectionPaneModel) SetCollection(collection string) {
+	m.collection = collection
 }
 
 func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
@@ -133,8 +142,7 @@ func (m CollectionPaneModel) footer() string {
 }
 
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
-	collectionName := internal.DefaultCollectionStore.Collection()
-	title := []string{"[1]", "Collection", "(" + collectionName + ")"}
+	title := []string{"[1]", "Collection", "(" + m.collection + ")"}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
 		styles.GenerateBorderOption{

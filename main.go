@@ -10,17 +10,13 @@ import (
 )
 
 func Run() error {
-	collectionStore := internal.DefaultCollectionStore
-	if err := collectionStore.SetDefaultRoot(); err != nil {
-		return err
-	}
-	dir := collectionStore.CollectionRequestDir()
-	store, err := internal.NewRequestFileStore(dir)
+	collectionStore, err := internal.NewDefaultCollectionStore()
 	if err != nil {
-		return fmt.Errorf("error initializing file store: %v", err)
+		return fmt.Errorf("error initializing collection store: %v", err)
 	}
-
-	model := tui.NewRootModel(store, tui.WithCollectionPaneWidth(0.33))
+	dir := collectionStore.CurrentCollectionRequestDir()
+	requestStore := internal.NewRequestFileStore(dir)
+	model := tui.NewRootModel(collectionStore, requestStore, tui.WithCollectionPaneWidth(0.33))
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err = program.Run()
 	return err
