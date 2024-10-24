@@ -117,7 +117,7 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		styles.GenerateBorderOption{Title: []string{"[4]", "Response"}, Footer: footer},
+		styles.GenerateBorderOption{Title: []string{"[5]", "Response"}, Footer: footer},
 		m.width,
 	)
 	// make the corner for the tab bar

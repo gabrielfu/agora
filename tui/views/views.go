@@ -4,8 +4,8 @@ type View uint
 
 const (
 	// Pane views
-	CollectionListPaneView View = iota
-	CollectionPaneView
+	CollectionPaneView View = iota
+	CollectionListPaneView
 	UrlPaneView
 	RequestPaneView
 	ResponsePaneView

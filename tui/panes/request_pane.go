@@ -149,7 +149,7 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		styles.GenerateBorderOption{Title: []string{"[3]", "Request"}, Footer: footer},
+		styles.GenerateBorderOption{Title: []string{"[4]", "Request"}, Footer: footer},
 		m.width,
 	)
 	// make the corner for the tab bar

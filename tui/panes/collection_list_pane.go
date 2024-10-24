@@ -30,11 +30,13 @@ type CollectionListPaneModel struct {
 
 	dctx           *states.DialogContext
 	list           list.Model
+	itemDelegate   *simpleItemDelegate
 	editNameDialog dialogs.TextInputDialog
 }
 
 func NewCollectionListPaneModel(dctx *states.DialogContext) CollectionListPaneModel {
-	l := list.New([]list.Item{}, simpleItemDelegate{}, 0, 0)
+	itemDelegate := simpleItemDelegate{SelectedStyle: simpleItemStyle}
+	l := list.New([]list.Item{}, itemDelegate, 0, 0)
 	l.SetShowTitle(false)
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
@@ -42,21 +44,27 @@ func NewCollectionListPaneModel(dctx *states.DialogContext) CollectionListPaneMo
 	l.SetShowFilter(false)
 
 	return CollectionListPaneModel{
-		dctx: dctx,
-		list: l,
+		dctx:         dctx,
+		list:         l,
+		itemDelegate: &itemDelegate,
 		editNameDialog: dialogs.NewTextInputDialog(
 			64,
-			[]string{"Name"},
+			[]string{"Collection"},
 			nil,
-			updateNameCmd,
-			views.CollectionPaneView,
+			nil,
+			views.CollectionListPaneView,
 		),
 	}
 }
 
+func (m *CollectionListPaneModel) refreshItemDelegate() {
+	m.list.SetDelegate(*m.itemDelegate)
+}
+
 func (m *CollectionListPaneModel) SetWidth(width int) {
 	m.width = width
-	m.list.SetDelegate(simpleItemDelegate{Width: width - 2})
+	m.itemDelegate.Width = width - 2
+	m.refreshItemDelegate()
 }
 
 func (m *CollectionListPaneModel) SetHeight(height int) {
@@ -81,7 +89,7 @@ func (m CollectionListPaneModel) generateStyle() lipgloss.Style {
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
 		styles.GenerateBorderOption{
-			Title:  []string{"[0]", "Collections"},
+			Title:  []string{"[2]", "Collections"},
 			Footer: []string{m.footer()},
 		},
 		m.width,
@@ -91,6 +99,16 @@ func (m CollectionListPaneModel) generateStyle() lipgloss.Style {
 		BorderForeground(lipgloss.Color(m.borderColor)).
 		Width(m.width).
 		Height(m.height)
+}
+
+func (m *CollectionListPaneModel) Blur() {
+	m.itemDelegate.SelectedStyle = simpleItemStyle
+	m.refreshItemDelegate()
+}
+
+func (m *CollectionListPaneModel) Focus() {
+	m.itemDelegate.SelectedStyle = selectedSimpleItemStyle
+	m.refreshItemDelegate()
 }
 
 func (m *CollectionListPaneModel) SetCollections(collections []string) {
@@ -110,6 +128,7 @@ func (m *CollectionListPaneModel) handleSelectCollection(collection string) tea.
 }
 
 func (m *CollectionListPaneModel) handleNewCollection() {
+	m.editNameDialog.SetValue("")
 	m.editNameDialog.SetCmdFunc(newCollectionCmdFunc)
 	m.editNameDialog.Focus()
 	m.dctx.SetDialog(&m.editNameDialog)

@@ -36,7 +36,8 @@ var (
 )
 
 type simpleItemDelegate struct {
-	Width int
+	Width         int
+	SelectedStyle lipgloss.Style
 }
 
 func (d simpleItemDelegate) Height() int                             { return 1 }
@@ -55,7 +56,7 @@ func (d simpleItemDelegate) Render(w io.Writer, m list.Model, index int, listIte
 			if len(str) < d.Width {
 				str = str + strings.Repeat(" ", d.Width-len(str))
 			}
-			return selectedSimpleItemStyle.Render(str)
+			return d.SelectedStyle.Render(str)
 		}
 	}
 	fmt.Fprint(w, fn(i.value))

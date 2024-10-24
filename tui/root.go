@@ -94,19 +94,21 @@ func (m *RootModel) SetCollection(collection string) {
 
 func (m *RootModel) setFocus(v views.View) {
 	m.focus = v
-	m.collectionListPane.SetBorderColor(styles.DefaultBorderColor)
 	m.collectionPane.SetBorderColor(styles.DefaultBorderColor)
+	m.collectionListPane.SetBorderColor(styles.DefaultBorderColor)
 	m.urlPane.SetBorderColor(styles.DefaultBorderColor)
 	m.requestPane.SetBorderColor(styles.DefaultBorderColor)
 	m.responsePane.SetBorderColor(styles.DefaultBorderColor)
 	m.collectionPane.Blur()
+	m.collectionListPane.Blur()
 
 	switch v {
-	case views.CollectionListPaneView:
-		m.collectionListPane.SetBorderColor(styles.FocusBorderColor)
 	case views.CollectionPaneView:
 		m.collectionPane.SetBorderColor(styles.FocusBorderColor)
 		m.collectionPane.Focus()
+	case views.CollectionListPaneView:
+		m.collectionListPane.SetBorderColor(styles.FocusBorderColor)
+		m.collectionListPane.Focus()
 	case views.UrlPaneView:
 		m.urlPane.SetBorderColor(styles.FocusBorderColor)
 	case views.RequestPaneView:
@@ -187,15 +189,15 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// switch focus
 		if views.IsPaneView(m.focus) {
 			switch msg.String() {
-			case "0":
-				m.setFocus(views.CollectionListPaneView)
 			case "1":
 				m.setFocus(views.CollectionPaneView)
 			case "2":
-				m.setFocus(views.UrlPaneView)
+				m.setFocus(views.CollectionListPaneView)
 			case "3":
-				m.setFocus(views.RequestPaneView)
+				m.setFocus(views.UrlPaneView)
 			case "4":
+				m.setFocus(views.RequestPaneView)
+			case "5":
 				m.setFocus(views.ResponsePaneView)
 			}
 		}
