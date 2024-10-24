@@ -20,11 +20,12 @@ type RootModel struct {
 	collectionStore *internal.CollectionStore
 	requestStore    *internal.RequestFileStore
 
-	collectionPane panes.CollectionPaneModel
-	urlPane        panes.UrlPaneModel
-	requestPane    panes.RequestPaneModel
-	responsePane   panes.ResponsePaneModel
-	navigation     NagivationModel
+	collectionListPane panes.CollectionListPaneModel
+	collectionPane     panes.CollectionPaneModel
+	urlPane            panes.UrlPaneModel
+	requestPane        panes.RequestPaneModel
+	responsePane       panes.ResponsePaneModel
+	navigation         NagivationModel
 
 	focus views.View
 	rctx  *states.RequestContext
@@ -52,17 +53,18 @@ func NewRootModel(
 	rctx := states.NewRequestContext()
 	dctx := states.NewDialogContext()
 	m := &RootModel{
-		collectionStore: collectionStore,
-		requestStore:    requestStore,
-		collectionPane:  panes.NewCollectionPaneModel(rctx, dctx, collectionStore.CurrentCollection()),
-		urlPane:         panes.NewUrlPaneModel(rctx, dctx),
-		requestPane:     panes.NewRequestPaneModel(rctx, dctx),
-		responsePane:    panes.NewResponsePaneModel(rctx),
-		navigation:      NagivationModel{},
-		focus:           views.CollectionPaneView,
-		rctx:            rctx,
-		dctx:            dctx,
-		enoughSpace:     true,
+		collectionStore:    collectionStore,
+		requestStore:       requestStore,
+		collectionListPane: panes.NewCollectionListPaneModel(dctx),
+		collectionPane:     panes.NewCollectionPaneModel(rctx, dctx, collectionStore.CurrentCollection()),
+		urlPane:            panes.NewUrlPaneModel(rctx, dctx),
+		requestPane:        panes.NewRequestPaneModel(rctx, dctx),
+		responsePane:       panes.NewResponsePaneModel(rctx),
+		navigation:         NagivationModel{},
+		focus:              views.CollectionPaneView,
+		rctx:               rctx,
+		dctx:               dctx,
+		enoughSpace:        true,
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -92,6 +94,7 @@ func (m *RootModel) SetCollection(collection string) {
 
 func (m *RootModel) setFocus(v views.View) {
 	m.focus = v
+	m.collectionListPane.SetBorderColor(styles.DefaultBorderColor)
 	m.collectionPane.SetBorderColor(styles.DefaultBorderColor)
 	m.urlPane.SetBorderColor(styles.DefaultBorderColor)
 	m.requestPane.SetBorderColor(styles.DefaultBorderColor)
@@ -99,6 +102,8 @@ func (m *RootModel) setFocus(v views.View) {
 	m.collectionPane.Blur()
 
 	switch v {
+	case views.CollectionListPaneView:
+		m.collectionListPane.SetBorderColor(styles.FocusBorderColor)
 	case views.CollectionPaneView:
 		m.collectionPane.SetBorderColor(styles.FocusBorderColor)
 		m.collectionPane.Focus()
@@ -109,7 +114,6 @@ func (m *RootModel) setFocus(v views.View) {
 	case views.ResponsePaneView:
 		m.responsePane.SetBorderColor(styles.FocusBorderColor)
 	}
-
 	m.navigation.SetFocus(v)
 }
 
@@ -118,6 +122,8 @@ func (m *RootModel) updatePanes(msg tea.Msg) tea.Cmd {
 		cmd  tea.Cmd
 		cmds []tea.Cmd
 	)
+	m.collectionListPane, cmd = m.collectionListPane.Update(msg)
+	cmds = append(cmds, cmd)
 	m.collectionPane, cmd = m.collectionPane.Update(msg)
 	cmds = append(cmds, cmd)
 	m.urlPane, cmd = m.urlPane.Update(msg)
@@ -181,6 +187,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// switch focus
 		if views.IsPaneView(m.focus) {
 			switch msg.String() {
+			case "0":
+				m.setFocus(views.CollectionListPaneView)
 			case "1":
 				m.setFocus(views.CollectionPaneView)
 			case "2":
@@ -198,6 +206,8 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		// update focused pane
 		switch m.focus {
+		case views.CollectionListPaneView:
+			m.collectionListPane, cmd = m.collectionListPane.Update(msg)
 		case views.CollectionPaneView:
 			m.collectionPane, cmd = m.collectionPane.Update(msg)
 		case views.UrlPaneView:
@@ -218,8 +228,11 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		collectionPaneWidth := int(float32(m.width) * m.collectionPaneWidth)
+		m.collectionListPane.SetWidth(collectionPaneWidth)
+		m.collectionListPane.SetHeight(m.height/2 - 4)
+
 		m.collectionPane.SetWidth(collectionPaneWidth)
-		m.collectionPane.SetHeight(m.height)
+		m.collectionPane.SetHeight(m.height/2 + 2)
 
 		urlPaneWidth := m.width - collectionPaneWidth - 2
 		m.urlPane.SetWidth(urlPaneWidth)
@@ -240,10 +253,15 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	// Set requests for collection pane
+	collections, err := m.collectionStore.ListCollections()
+	if err != nil {
+		return m, tea.Quit
+	}
 	reqs, err := m.requestStore.ListRequests()
 	if err != nil {
 		return m, tea.Quit
 	}
+	m.collectionListPane.SetCollections(collections)
 	m.collectionPane.SetRequests(reqs)
 	m.requestPane.Refresh()
 	m.responsePane.Refresh()
@@ -272,7 +290,11 @@ func (m RootModel) View() string {
 	} else {
 		content = lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			m.collectionPane.View(),
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				m.collectionPane.View(),
+				m.collectionListPane.View(),
+			),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				m.urlPane.View(),

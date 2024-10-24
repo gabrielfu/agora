@@ -34,3 +34,16 @@ type CopyRequestMsg struct {
 type SetCollectionMsg struct {
 	Collection string
 }
+
+type CreateCollectionMsg struct {
+	Collection string
+}
+
+type DeleteCollectionMsg struct {
+	Collection string
+}
+
+type UpdateCollectionMsg struct {
+	OldName string
+	NewName string
+}

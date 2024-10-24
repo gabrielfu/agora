@@ -29,4 +29,13 @@ var (
 	SetCollectionCmd = func(c string) tea.Cmd {
 		return func() tea.Msg { return SetCollectionMsg{Collection: c} }
 	}
+	CreateCollectionCmd = func(c string) tea.Cmd {
+		return func() tea.Msg { return CreateCollectionMsg{Collection: c} }
+	}
+	DeleteCollectionCmd = func(c string) tea.Cmd {
+		return func() tea.Msg { return DeleteCollectionMsg{Collection: c} }
+	}
+	UpdateCollectionCmd = func(old, new string) tea.Cmd {
+		return func() tea.Msg { return UpdateCollectionMsg{OldName: old, NewName: new} }
+	}
 )
