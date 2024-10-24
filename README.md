@@ -12,7 +12,9 @@ something like Postman or Bruno.
 
 All data are saved locally in your machine.
 
-![](./assets/demo.mp4)
+<p align="center">
+  <video src="assets/demo.mp4" width="500px"></video>
+</p>
 
 ### Installation
 
