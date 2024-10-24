@@ -8,11 +8,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// File store of a single collection
 type RequestFileStore struct {
 	root string
 }
 
-func NewRquestFileStore(root string) (*RequestFileStore, error) {
+func NewRequestFileStore(root string) (*RequestFileStore, error) {
 	if err := os.MkdirAll(root, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
 	}

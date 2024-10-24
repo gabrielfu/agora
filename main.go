@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gabrielfu/agora/internal"
@@ -11,12 +10,12 @@ import (
 )
 
 func Run() error {
-	home, err := os.UserHomeDir()
-	if err != nil {
+	collectionStore := internal.DefaultCollectionStore
+	if err := collectionStore.SetDefaultRoot(); err != nil {
 		return err
 	}
-	dir := filepath.Join(home, ".agora", "data", "requests")
-	store, err := internal.NewRquestFileStore(dir)
+	dir := collectionStore.CollectionRequestDir("default")
+	store, err := internal.NewRequestFileStore(dir)
 	if err != nil {
 		return fmt.Errorf("error initializing file store: %v", err)
 	}
