@@ -15,7 +15,10 @@ func Run() error {
 		return fmt.Errorf("error initializing collection store: %v", err)
 	}
 	dir := collectionStore.CurrentCollectionRequestDir()
-	requestStore := internal.NewRequestFileStore(dir)
+	requestStore, err := internal.NewRequestFileStore(dir)
+	if err != nil {
+		return fmt.Errorf("error initializing collection store: %v", err)
+	}
 	model := tui.NewRootModel(collectionStore, requestStore, tui.WithCollectionPaneWidth(0.33))
 	program := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err = program.Run()

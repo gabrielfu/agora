@@ -14,10 +14,18 @@ go install github.com/gabrielfu/agora
 
 Then, you can launch Agora with the command `agora`.
 
-### Features: Coming Soon
-- [ ] Multiple collections
+### Features
+
+- [X] Send HTTP requests (only JSON body supported)
+- [X] Multiple collections
+- [X] All data saved locally
+- [X] Support Linux, MacOS and Windows
+
+#### Coming Soon
+
 - [ ] Response history
 - [ ] Authentication helper
 - [ ] Environments
 - [ ] Request timeout
 - [ ] File upload
+- [ ] Non JSON body
