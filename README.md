@@ -1,8 +1,16 @@
 ### Agora - Terminal based API client
 
-Agora is a simple and basic app that lets you build API requests on the terminal. Inspired by [lazygit](https://github.com/jesseduffield/lazygit) and [Postman](https://www.postman.com). Powered by [Bubble Tea](https://github.com/charmbracelet/bubbletea).
+Agora is a simple and basic app that lets you build API requests on the terminal. 
+Inspired by [lazygit](https://github.com/jesseduffield/lazygit) and [Postman](https://www.postman.com). 
+Powered by [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
-All data are saved locally in `$HOME/.agora/data.sqlite`.
+This tool is intended for backend developers who are prototyping API servers and want to
+quickly and repeatedly test out their endpoints, without ever leaving their terminal or IDE.
+
+If you need a more robust and full feature API client, you may want to use
+something like Postman or Bruno.
+
+All data are saved locally in `$HOME/.agora`.
 
 ![](./assets/demo.gif)
 
