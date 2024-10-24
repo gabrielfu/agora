@@ -12,9 +12,7 @@ something like Postman or Bruno.
 
 All data are saved locally in your machine.
 
-<p align="center">
-  <video src="assets/demo.mp4" width="500px"></video>
-</p>
+https://github.com/user-attachments/assets/a70e0878-d1b4-4977-8043-249830afb623
 
 ### Installation
 
