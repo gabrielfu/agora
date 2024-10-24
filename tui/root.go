@@ -249,16 +249,16 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height - 3
 
 		m.enoughSpace = false
-		if m.width >= 78 && m.height >= 8 {
+		if m.width >= 78 && m.height >= 12 {
 			m.enoughSpace = true
 		}
 
 		collectionPaneWidth := int(float32(m.width) * m.collectionPaneWidth)
-		m.collectionListPane.SetWidth(collectionPaneWidth)
-		m.collectionListPane.SetHeight(m.height/2 - 4)
-
 		m.collectionPane.SetWidth(collectionPaneWidth)
-		m.collectionPane.SetHeight(m.height/2 + 2)
+		m.collectionPane.SetHeight(m.height - 8)
+
+		m.collectionListPane.SetWidth(collectionPaneWidth)
+		m.collectionListPane.SetHeight(6)
 
 		urlPaneWidth := m.width - collectionPaneWidth - 2
 		m.urlPane.SetWidth(urlPaneWidth)
