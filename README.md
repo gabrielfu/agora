@@ -16,11 +16,15 @@ https://github.com/user-attachments/assets/a70e0878-d1b4-4977-8043-249830afb623
 
 ### Installation
 
+#### Binary Release
+
+For Windows, MacOS and Linux, you can ownload from [GitHub release page](https://github.com/gabrielfu/agora/releases)
+
+#### Install from Source
+
 ```shell
 go install github.com/gabrielfu/agora
 ```
-
-Then, you can launch Agora with the command `agora`.
 
 ### Usage
 
