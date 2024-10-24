@@ -12,7 +12,7 @@ something like Postman or Bruno.
 
 All data are saved locally in your machine.
 
-![](./assets/demo.gif)
+![](./assets/demo.mp4)
 
 ### Installation
 
