@@ -34,7 +34,7 @@ Run `agora` anywhere. Data will be saved in the default directory `$HOME/.agora`
 agora
 ```
 
-Alternatively, you can save your data in your project directory to have an isolate environment.
+Alternatively, you can save your data in your project directory to have a separate workspace.
 
 ```shell
 # this will read and write data to `./.agora`
