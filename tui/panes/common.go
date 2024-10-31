@@ -13,14 +13,6 @@ import (
 	"github.com/gabrielfu/agora/tui/styles"
 )
 
-type kvItem struct {
-	key, value string
-}
-
-func (i kvItem) Title() string       { return i.key }
-func (i kvItem) Description() string { return i.value }
-func (i kvItem) FilterValue() string { return i.key }
-
 type simpleItem struct {
 	value string
 }
