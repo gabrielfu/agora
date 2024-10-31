@@ -149,10 +149,15 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 	var footer []string
 	if m.tab == requestBodyTab && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	} else if m.tab == requestParamsTab || m.tab == requestHeadersTab {
+		footer = append(footer, tableFooter(&m.table))
 	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
-		styles.GenerateBorderOption{Title: []string{"[4]", "Request"}, Footer: footer},
+		styles.GenerateBorderOption{
+			Title:  []string{"[4]", "Request"},
+			Footer: footer,
+		},
 		m.width,
 	)
 	// make the corner for the tab bar

@@ -119,6 +119,8 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	var footer []string
 	if m.tab == responseBodyTab && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	} else if m.tab == responseHeadersTab {
+		footer = append(footer, tableFooter(&m.table))
 	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),

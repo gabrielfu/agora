@@ -1,8 +1,6 @@
 package panes
 
 import (
-	"strconv"
-
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -109,23 +107,13 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 	m.Update(nil)
 }
 
-func (m CollectionPaneModel) footer() string {
-	cursor := m.table.Cursor() + 1
-	total := len(m.table.Rows())
-	cursorString := " -"
-	if cursor <= total {
-		cursorString = strconv.Itoa(cursor)
-	}
-	return cursorString + " / " + strconv.Itoa(total)
-}
-
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 	title := []string{"[1]", "Collection", "(" + m.collection + ")"}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
 		styles.GenerateBorderOption{
 			Title:  title,
-			Footer: []string{m.footer()},
+			Footer: []string{tableFooter(&m.table)},
 		},
 		m.width,
 	)

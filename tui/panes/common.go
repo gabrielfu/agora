@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -107,4 +108,14 @@ func getKeyValueFromTableCursor(table *table.Model) (
 	key = row[0]
 	value = row[1]
 	return
+}
+
+func tableFooter(table *table.Model) string {
+	cursor := table.Cursor() + 1
+	total := len(table.Rows())
+	cursorString := " -"
+	if cursor <= total {
+		cursorString = strconv.Itoa(cursor)
+	}
+	return cursorString + " / " + strconv.Itoa(total)
 }
