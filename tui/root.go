@@ -267,13 +267,13 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		urlPaneWidth := m.width - collectionPaneWidth - 2
 		m.urlPane.SetWidth(urlPaneWidth)
 
-		requestPaneWidth := urlPaneWidth / 2
-		m.requestPane.SetWidth(requestPaneWidth)
-		m.requestPane.SetHeight(m.height - 3)
+		requestPaneHeight := (m.height - 5) / 2
+		m.requestPane.SetWidth(urlPaneWidth)
+		m.requestPane.SetHeight(requestPaneHeight)
 
-		responsePaneWidth := urlPaneWidth - requestPaneWidth - 2
-		m.responsePane.SetWidth(responsePaneWidth)
-		m.responsePane.SetHeight(m.height - 3)
+		responsePaneHeight := m.height - 5 - requestPaneHeight
+		m.responsePane.SetWidth(urlPaneWidth)
+		m.responsePane.SetHeight(responsePaneHeight)
 
 		m.dctx.SetDialogWidth(m.width)
 		m.dctx.SetDialogHeight(m.height)
@@ -328,8 +328,8 @@ func (m RootModel) View() string {
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				m.urlPane.View(),
-				lipgloss.JoinHorizontal(
-					lipgloss.Top,
+				lipgloss.JoinVertical(
+					lipgloss.Left,
 					m.requestPane.View(),
 					m.responsePane.View(),
 				),

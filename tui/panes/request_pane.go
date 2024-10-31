@@ -137,8 +137,7 @@ func (m *RequestPaneModel) SetWidth(width int) {
 func (m *RequestPaneModel) SetHeight(height int) {
 	m.height = height
 	m.table.SetHeight(height - 2)
-	verticalMarginHeight := 9
-	m.viewport.Height = height - verticalMarginHeight
+	m.viewport.Height = height - 2
 }
 
 func (m *RequestPaneModel) SetBorderColor(color string) {
