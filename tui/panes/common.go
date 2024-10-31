@@ -64,6 +64,12 @@ func (d simpleItemDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	fmt.Fprint(w, fn(i.value))
 }
 
+func renderTableWithoutHeader(table *table.Model) string {
+	t := table.View()
+	ts := strings.SplitN(t, "\n", 2)
+	return ts[len(ts)-1]
+}
+
 func makeKeyValueColumns(width int) []table.Column {
 	keyWidth := int(float64(width) * 0.4)
 	return []table.Column{

@@ -2,7 +2,6 @@ package panes
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -166,12 +165,6 @@ func (m *CollectionPaneModel) Focus() {
 	m.table.SetStyles(tableStyles())
 }
 
-func (m CollectionPaneModel) renderTableWithoutHeader() string {
-	t := m.table.View()
-	ts := strings.SplitN(t, "\n", 2)
-	return ts[len(ts)-1]
-}
-
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -216,6 +209,6 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 }
 
 func (m CollectionPaneModel) View() string {
-	text := m.renderTableWithoutHeader()
+	text := renderTableWithoutHeader(&m.table)
 	return m.generateStyle().Render(text)
 }
