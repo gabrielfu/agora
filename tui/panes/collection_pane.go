@@ -1,9 +1,6 @@
 package panes
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,27 +11,6 @@ import (
 	"github.com/gabrielfu/agora/tui/styles"
 	"github.com/gabrielfu/agora/tui/views"
 )
-
-var (
-	tableSelectedStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("#FFFFFF")).
-				Background(lipgloss.Color(styles.SelectedBackgroundColor))
-	tableBlurSelectedStyle = lipgloss.NewStyle()
-)
-
-func tableStyles() table.Styles {
-	s := table.DefaultStyles()
-	s.Selected = tableSelectedStyle
-	s.Cell = lipgloss.NewStyle()
-	return s
-}
-
-func tableBlurStyles() table.Styles {
-	s := table.DefaultStyles()
-	s.Selected = tableBlurSelectedStyle
-	s.Cell = lipgloss.NewStyle()
-	return s
-}
 
 type CollectionPaneModel struct {
 	width       int
@@ -52,7 +28,7 @@ type CollectionPaneModel struct {
 
 func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext, collection string) CollectionPaneModel {
 	t := table.New(
-		table.WithColumns(makeColumns(0)),
+		table.WithColumns(makeCollectionColumns(0)),
 		table.WithRows(make([]table.Row, 0)),
 		table.WithFocused(true),
 		table.WithStyles(tableStyles()),
@@ -85,7 +61,7 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 	}
 }
 
-func makeColumns(width int) []table.Column {
+func makeCollectionColumns(width int) []table.Column {
 	return []table.Column{
 		{Title: "Method", Width: 6},
 		{Title: "URL", Width: max(0, width-6)},
@@ -95,7 +71,7 @@ func makeColumns(width int) []table.Column {
 func (m *CollectionPaneModel) SetWidth(width int) {
 	m.width = width
 	m.table.SetWidth(width)
-	m.table.SetColumns(makeColumns(width))
+	m.table.SetColumns(makeCollectionColumns(width))
 }
 
 func (m *CollectionPaneModel) SetHeight(height int) {
@@ -131,23 +107,13 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 	m.Update(nil)
 }
 
-func (m CollectionPaneModel) footer() string {
-	cursor := m.table.Cursor() + 1
-	total := len(m.table.Rows())
-	cursorString := " -"
-	if cursor <= total {
-		cursorString = strconv.Itoa(cursor)
-	}
-	return cursorString + " / " + strconv.Itoa(total)
-}
-
 func (m CollectionPaneModel) generateStyle() lipgloss.Style {
 	title := []string{"[1]", "Collection", "(" + m.collection + ")"}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
 		styles.GenerateBorderOption{
 			Title:  title,
-			Footer: []string{m.footer()},
+			Footer: []string{tableFooter(&m.table)},
 		},
 		m.width,
 	)
@@ -164,12 +130,6 @@ func (m *CollectionPaneModel) Blur() {
 
 func (m *CollectionPaneModel) Focus() {
 	m.table.SetStyles(tableStyles())
-}
-
-func (m CollectionPaneModel) renderTableWithoutHeader() string {
-	t := m.table.View()
-	ts := strings.SplitN(t, "\n", 2)
-	return ts[len(ts)-1]
 }
 
 func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) {
@@ -216,6 +176,6 @@ func (m CollectionPaneModel) Update(msg tea.Msg) (CollectionPaneModel, tea.Cmd) 
 }
 
 func (m CollectionPaneModel) View() string {
-	text := m.renderTableWithoutHeader()
+	text := renderTableWithoutHeader(&m.table)
 	return m.generateStyle().Render(text)
 }

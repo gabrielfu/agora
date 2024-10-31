@@ -1,23 +1,18 @@
 package panes
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/agora/tui/styles"
 )
-
-type kvItem struct {
-	key, value string
-}
-
-func (i kvItem) Title() string       { return i.key }
-func (i kvItem) Description() string { return i.value }
-func (i kvItem) FilterValue() string { return i.key }
 
 type simpleItem struct {
 	value string
@@ -60,4 +55,67 @@ func (d simpleItemDelegate) Render(w io.Writer, m list.Model, index int, listIte
 		}
 	}
 	fmt.Fprint(w, fn(i.value))
+}
+
+var (
+	tableSelectedStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFFFFF")).
+				Background(lipgloss.Color(styles.SelectedBackgroundColor))
+	tableBlurSelectedStyle = lipgloss.NewStyle()
+)
+
+func tableStyles() table.Styles {
+	s := table.DefaultStyles()
+	s.Selected = tableSelectedStyle
+	s.Cell = lipgloss.NewStyle()
+	return s
+}
+
+func tableBlurStyles() table.Styles {
+	s := table.DefaultStyles()
+	s.Selected = tableBlurSelectedStyle
+	s.Cell = lipgloss.NewStyle()
+	return s
+}
+
+func renderTableWithoutHeader(table *table.Model) string {
+	t := table.View()
+	ts := strings.SplitN(t, "\n", 2)
+	return ts[len(ts)-1]
+}
+
+func makeKeyValueColumns(width int) []table.Column {
+	keyWidth := int(float64(width) * 0.4)
+	return []table.Column{
+		{Title: "Key", Width: keyWidth},
+		{Title: "Value", Width: width - keyWidth},
+	}
+}
+
+func getKeyValueFromTableCursor(table *table.Model) (
+	cursor int, key string, value string, err error,
+) {
+	cursor = table.Cursor()
+	if cursor < 0 || cursor >= len(table.Rows()) {
+		err = errors.New("cursor out of bounds")
+		return
+	}
+	row := table.Rows()[cursor]
+	if len(row) != 2 {
+		err = errors.New("invalid row")
+		return
+	}
+	key = row[0]
+	value = row[1]
+	return
+}
+
+func tableFooter(table *table.Model) string {
+	cursor := table.Cursor() + 1
+	total := len(table.Rows())
+	cursorString := " -"
+	if cursor <= total {
+		cursorString = strconv.Itoa(cursor)
+	}
+	return cursorString + " / " + strconv.Itoa(total)
 }

@@ -103,6 +103,8 @@ func (m *RootModel) setFocus(v views.View) {
 	m.urlPane.SetBorderColor(styles.DefaultBorderColor)
 	m.requestPane.SetBorderColor(styles.DefaultBorderColor)
 	m.responsePane.SetBorderColor(styles.DefaultBorderColor)
+	m.requestPane.Blur()
+	m.responsePane.Blur()
 	m.collectionPane.Blur()
 	m.collectionListPane.Blur()
 
@@ -117,8 +119,10 @@ func (m *RootModel) setFocus(v views.View) {
 		m.urlPane.SetBorderColor(styles.FocusBorderColor)
 	case views.RequestPaneView:
 		m.requestPane.SetBorderColor(styles.FocusBorderColor)
+		m.requestPane.Focus()
 	case views.ResponsePaneView:
 		m.responsePane.SetBorderColor(styles.FocusBorderColor)
+		m.responsePane.Focus()
 	}
 	m.navigation.SetFocus(v)
 }

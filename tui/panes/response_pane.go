@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -33,30 +33,38 @@ type ResponsePaneModel struct {
 
 	tab      responsePaneTab
 	viewport viewport.Model
-	list     list.Model
+	table    table.Model
 }
 
 func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
-	l := list.New([]list.Item{}, list.NewDefaultDelegate(), 0, 0)
-	l.SetShowTitle(false)
-	l.SetShowStatusBar(false)
-	l.SetFilteringEnabled(false)
-	l.SetShowHelp(false)
-	l.SetShowFilter(false)
+	t := table.New(
+		table.WithColumns(makeKeyValueColumns(0)),
+		table.WithRows(make([]table.Row, 0)),
+		table.WithFocused(true),
+		table.WithStyles(tableStyles()),
+	)
+	t.KeyMap.HalfPageUp.SetEnabled(false)
+	t.KeyMap.HalfPageDown.SetEnabled(false)
 	return ResponsePaneModel{
 		rctx:     rctx,
 		tab:      responseBodyTab,
-		list:     l,
+		table:    t,
 		viewport: viewport.New(0, 0),
 	}
 }
 
 func (m *ResponsePaneModel) SetWidth(width int) {
 	m.width = width
+	m.table.SetWidth(width)
+	m.table.SetColumns(makeKeyValueColumns(width))
+	m.viewport.Width = width - 2
 }
 
 func (m *ResponsePaneModel) SetHeight(height int) {
 	m.height = height
+	m.table.SetHeight(height - 4)
+	verticalMarginHeight := 10
+	m.viewport.Height = height - verticalMarginHeight
 }
 
 func (m *ResponsePaneModel) SetBorderColor(color string) {
@@ -114,6 +122,8 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 	var footer []string
 	if m.tab == responseBodyTab && m.viewport.TotalLineCount() > 0 {
 		footer = append(footer, fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	} else if m.tab == responseHeadersTab {
+		footer = append(footer, tableFooter(&m.table))
 	}
 	border := styles.GenerateBorder(
 		lipgloss.RoundedBorder(),
@@ -131,11 +141,11 @@ func (m ResponsePaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m *ResponsePaneModel) Refresh() {
-	items := make([]list.Item, 0)
+	rows := make([]table.Row, 0)
 	if m.rctx.Empty() {
 		m.fingerprint = ""
 		m.viewport.SetContent("")
-		m.list.SetItems(items)
+		m.table.SetRows(rows)
 		return
 	}
 
@@ -154,10 +164,10 @@ func (m *ResponsePaneModel) Refresh() {
 
 		if m.rctx.Response() != nil {
 			for _, kv := range m.rctx.Response().Headers {
-				items = append(items, kvItem{key: kv.Key, value: kv.Value})
+				rows = append(rows, table.Row{kv.Key, kv.Value})
 			}
 		}
-		m.list.SetItems(items)
+		m.table.SetRows(rows)
 	}
 }
 
@@ -176,17 +186,20 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 		case "]", "tab":
 			m.switchTab(1)
 		}
-	case tea.WindowSizeMsg:
-		verticalMarginHeight := 10
-		m.viewport.Width = msg.Width - 2
-		m.viewport.Height = msg.Height - verticalMarginHeight
-		m.list.SetSize(m.width-2, m.height-4)
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
-	m.list, cmd = m.list.Update(msg)
+	m.table, cmd = m.table.Update(msg)
 	cmds = append(cmds, cmd)
 	return m, tea.Batch(cmds...)
+}
+
+func (m *ResponsePaneModel) Blur() {
+	m.table.SetStyles(tableBlurStyles())
+}
+
+func (m *ResponsePaneModel) Focus() {
+	m.table.SetStyles(tableStyles())
 }
 
 func (m ResponsePaneModel) View() string {
@@ -196,7 +209,7 @@ func (m ResponsePaneModel) View() string {
 	text += m.renderDuration()
 	switch m.tab {
 	case responseHeadersTab:
-		text += m.list.View()
+		text += renderTableWithoutHeader(&m.table)
 	case responseBodyTab:
 		text += m.viewport.View()
 	}
