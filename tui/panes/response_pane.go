@@ -42,6 +42,15 @@ func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
 		table.WithRows(make([]table.Row, 0)),
 		table.WithFocused(true),
 		table.WithStyles(tableStyles()),
+		// UNSTABLE: see https://github.com/charmbracelet/bubbles/pull/586
+		table.WithStyleFunc(func(row, col int, value string) lipgloss.Style {
+			if col == 0 { // is key column
+				return lipgloss.NewStyle().
+					Foreground(lipgloss.Color(styles.KeyColor)).
+					Bold(true)
+			}
+			return lipgloss.NewStyle()
+		}),
 	)
 	t.KeyMap.HalfPageUp.SetEnabled(false)
 	t.KeyMap.HalfPageDown.SetEnabled(false)

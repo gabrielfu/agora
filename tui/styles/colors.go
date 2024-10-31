@@ -6,6 +6,8 @@ const (
 
 	SelectedBackgroundColor = "#61AFEF"
 
+	KeyColor = "#FFA23D"
+
 	StatusCode100Color     = "#C0A8E1"
 	StatusCode200Color     = "#68D696"
 	StatusCode300Color     = "#EED577"
