@@ -122,11 +122,14 @@ func (m *RequestPaneModel) SetWidth(width int) {
 	m.width = width
 	m.table.SetWidth(width)
 	m.table.SetColumns(makeKeyValueColumns(width))
+	m.viewport.Width = width - 2
 }
 
 func (m *RequestPaneModel) SetHeight(height int) {
 	m.height = height
 	m.table.SetHeight(height - 2)
+	verticalMarginHeight := 9
+	m.viewport.Height = height - verticalMarginHeight
 }
 
 func (m *RequestPaneModel) SetBorderColor(color string) {
@@ -323,10 +326,6 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 				}
 			}
 		}
-	case tea.WindowSizeMsg:
-		verticalMarginHeight := 9
-		m.viewport.Width = msg.Width - 2
-		m.viewport.Height = msg.Height - verticalMarginHeight
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)

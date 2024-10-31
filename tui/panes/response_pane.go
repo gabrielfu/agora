@@ -57,11 +57,14 @@ func (m *ResponsePaneModel) SetWidth(width int) {
 	m.width = width
 	m.table.SetWidth(width)
 	m.table.SetColumns(makeKeyValueColumns(width))
+	m.viewport.Width = width - 2
 }
 
 func (m *ResponsePaneModel) SetHeight(height int) {
 	m.height = height
 	m.table.SetHeight(height - 4)
+	verticalMarginHeight := 10
+	m.viewport.Height = height - verticalMarginHeight
 }
 
 func (m *ResponsePaneModel) SetBorderColor(color string) {
@@ -183,10 +186,6 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 		case "]", "tab":
 			m.switchTab(1)
 		}
-	case tea.WindowSizeMsg:
-		verticalMarginHeight := 10
-		m.viewport.Width = msg.Width - 2
-		m.viewport.Height = msg.Height - verticalMarginHeight
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
