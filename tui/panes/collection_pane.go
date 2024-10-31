@@ -14,27 +14,6 @@ import (
 	"github.com/gabrielfu/agora/tui/views"
 )
 
-var (
-	tableSelectedStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("#FFFFFF")).
-				Background(lipgloss.Color(styles.SelectedBackgroundColor))
-	tableBlurSelectedStyle = lipgloss.NewStyle()
-)
-
-func tableStyles() table.Styles {
-	s := table.DefaultStyles()
-	s.Selected = tableSelectedStyle
-	s.Cell = lipgloss.NewStyle()
-	return s
-}
-
-func tableBlurStyles() table.Styles {
-	s := table.DefaultStyles()
-	s.Selected = tableBlurSelectedStyle
-	s.Cell = lipgloss.NewStyle()
-	return s
-}
-
 type CollectionPaneModel struct {
 	width       int
 	height      int

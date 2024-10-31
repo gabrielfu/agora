@@ -64,6 +64,27 @@ func (d simpleItemDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	fmt.Fprint(w, fn(i.value))
 }
 
+var (
+	tableSelectedStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#FFFFFF")).
+				Background(lipgloss.Color(styles.SelectedBackgroundColor))
+	tableBlurSelectedStyle = lipgloss.NewStyle()
+)
+
+func tableStyles() table.Styles {
+	s := table.DefaultStyles()
+	s.Selected = tableSelectedStyle
+	s.Cell = lipgloss.NewStyle()
+	return s
+}
+
+func tableBlurStyles() table.Styles {
+	s := table.DefaultStyles()
+	s.Selected = tableBlurSelectedStyle
+	s.Cell = lipgloss.NewStyle()
+	return s
+}
+
 func renderTableWithoutHeader(table *table.Model) string {
 	t := table.View()
 	ts := strings.SplitN(t, "\n", 2)
