@@ -32,14 +32,17 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 		table.WithRows(make([]table.Row, 0)),
 		table.WithFocused(true),
 		table.WithStyles(tableStyles()),
-		// // Wait until StyleFunc is supported on bubbles/table
-		// table.WithStyleFunc(func(row, col int, value string) lipgloss.Style {
-		// 	if col == 0 { // is method column
-		// 		color := styles.GetMethodColor(value)
-		// 		return lipgloss.NewStyle().Foreground(lipgloss.Color(color))
-		// 	}
-		// 	return lipgloss.NewStyle()
-		// }),
+		// UNSTABLE: StyleFunc feature was removed from 0.19.0
+		// see https://github.com/charmbracelet/bubbles/pull/586
+		// we are using a commit before 0.19.0
+		// 549d0767b3edee6301709463ace03de1aa5ae72c
+		table.WithStyleFunc(func(row, col int, value string) lipgloss.Style {
+			if col == 0 { // is method column
+				color := styles.GetMethodColor(value)
+				return lipgloss.NewStyle().Foreground(lipgloss.Color(color))
+			}
+			return lipgloss.NewStyle()
+		}),
 	)
 
 	// disable "u" and "d"
