@@ -194,6 +194,14 @@ func (m ResponsePaneModel) Update(msg tea.Msg) (ResponsePaneModel, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
+func (m *ResponsePaneModel) Blur() {
+	m.table.SetStyles(tableBlurStyles())
+}
+
+func (m *ResponsePaneModel) Focus() {
+	m.table.SetStyles(tableStyles())
+}
+
 func (m ResponsePaneModel) View() string {
 	var text string
 	text = m.renderTabBar()
