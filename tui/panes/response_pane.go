@@ -91,11 +91,10 @@ func (m *ResponsePaneModel) switchTab(direction int) {
 	m.tab = responsePaneTab((int(m.tab) + direction + 2) % 2)
 }
 
-func (m ResponsePaneModel) renderStatus() string {
+func (m ResponsePaneModel) renderStatus() (text, color string) {
 	if m.rctx.Empty() {
-		return ""
+		return "", styles.DefaultBorderColor
 	}
-	var text, color string
 	if err := m.rctx.Error(); err != nil {
 		text = "Error"
 		color = styles.StatusErrorColor
@@ -104,26 +103,43 @@ func (m ResponsePaneModel) renderStatus() string {
 		text = fmt.Sprintf("%d %s", statusCode, internal.StatusText(statusCode))
 		color = styles.StatusCodeColor(statusCode)
 	} else {
-		return ""
+		return "", styles.DefaultBorderColor
 	}
-	text = runewidth.Truncate(text, m.width-2, "…")
-	return lipgloss.NewStyle().
-		Width(m.width-2).
-		MaxHeight(1).
-		Foreground(lipgloss.Color(color)).
-		Render(text) + "\n"
+	return
 }
 
-func (m ResponsePaneModel) renderDuration() string {
+func (m ResponsePaneModel) renderDuration() (text string) {
 	if m.rctx.Response() == nil {
 		return ""
 	}
-	text := m.rctx.Duration().String()
-	return lipgloss.NewStyle().
-		Width(m.width-2).
+	text = m.rctx.Duration().String()
+	return
+}
+
+func (m ResponsePaneModel) renderStatusDuration() string {
+	status, statusColor := m.renderStatus()
+	duration := m.renderDuration()
+
+	widthForStatus := m.width - runewidth.StringWidth(duration) - 2
+	if widthForStatus < 0 {
+		status = ""
+	} else if widthForStatus < runewidth.StringWidth(status) {
+		status = runewidth.Truncate(status, widthForStatus, "…")
+	}
+	numSpaces := widthForStatus - runewidth.StringWidth(status)
+	spaces := "  "
+	if numSpaces > 0 {
+		spaces += strings.Repeat(" ", numSpaces)
+	}
+	status = lipgloss.NewStyle().
 		MaxHeight(1).
-		Foreground(lipgloss.Color(styles.StatusCode200Color)).
-		Render(text) + "\n"
+		Foreground(lipgloss.Color(statusColor)).
+		Render(status)
+	duration = lipgloss.NewStyle().
+		MaxHeight(1).
+		Foreground(lipgloss.Color(statusColor)).
+		Render(duration)
+	return status + spaces + duration + "\n"
 }
 
 func (m ResponsePaneModel) generateStyle() lipgloss.Style {
@@ -213,8 +229,7 @@ func (m *ResponsePaneModel) Focus() {
 func (m ResponsePaneModel) View() string {
 	var text string
 	text = m.renderTabBar()
-	text += m.renderStatus()
-	text += m.renderDuration()
+	text += m.renderStatusDuration()
 	switch m.tab {
 	case responseHeadersTab:
 		text += renderTableWithoutHeader(&m.table)

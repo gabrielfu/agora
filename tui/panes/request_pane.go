@@ -136,7 +136,7 @@ func (m *RequestPaneModel) SetWidth(width int) {
 
 func (m *RequestPaneModel) SetHeight(height int) {
 	m.height = height
-	m.table.SetHeight(height - 2)
+	m.table.SetHeight(height - 1)
 	m.viewport.Height = height - 2
 }
 
