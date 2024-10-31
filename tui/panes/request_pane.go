@@ -27,11 +27,10 @@ const (
 	requestBodyTab
 )
 
-func updateParamCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
+func updateParamCmdFunc(cursor int) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
-			r.RemoveParam(key, originalValue)
-			r.WithParam(key, value)
+			r.Params[cursor].Value = value
 		})
 	}
 }
@@ -42,11 +41,10 @@ var newParamCmdFunc dialogs.DoubleTextInputCmdFunc = func(key, value string) tea
 	})
 }
 
-func updateHeaderCmdFunc(key, originalValue string) dialogs.TextInputCmdFunc {
+func updateHeaderCmdFunc(cursor int) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
-			r.RemoveHeader(key, originalValue)
-			r.WithHeader(key, value)
+			r.Headers[cursor].Value = value
 		})
 	}
 }
@@ -177,12 +175,11 @@ func (m RequestPaneModel) generateStyle() lipgloss.Style {
 }
 
 func (m *RequestPaneModel) handleUpdateParam() {
-	item, ok := m.list.SelectedItem().(kvItem)
-	if !ok {
+	cursor, key, value, err := getKeyValueFromTableCursor(&m.table)
+	if err != nil {
 		return
 	}
-	key, value := item.key, item.value
-	m.textInputDialog.SetCmdFunc(updateParamCmdFunc(key, value))
+	m.textInputDialog.SetCmdFunc(updateParamCmdFunc(cursor))
 	m.textInputDialog.SetPrompt(focusedStyle.Render(key + "="))
 	m.textInputDialog.SetValue(value)
 	m.textInputDialog.Focus()
@@ -196,23 +193,21 @@ func (m *RequestPaneModel) handleNewParam() {
 }
 
 func (m *RequestPaneModel) handleDeleteParam() tea.Cmd {
-	item, ok := m.list.SelectedItem().(kvItem)
-	if !ok {
+	cursor, _, _, err := getKeyValueFromTableCursor(&m.table)
+	if err != nil {
 		return nil
 	}
-	key, value := item.key, item.value
 	return messages.UpdateRequestCmd(func(r *internal.Request) {
-		r.RemoveParam(key, value)
+		r.RemoveParamI(cursor)
 	})
 }
 
 func (m *RequestPaneModel) handleUpdateHeader() {
-	item, ok := m.list.SelectedItem().(kvItem)
-	if !ok {
+	cursor, key, value, err := getKeyValueFromTableCursor(&m.table)
+	if err != nil {
 		return
 	}
-	key, value := item.key, item.value
-	m.textInputDialog.SetCmdFunc(updateHeaderCmdFunc(key, value))
+	m.textInputDialog.SetCmdFunc(updateHeaderCmdFunc(cursor))
 	m.textInputDialog.SetPrompt(focusedStyle.Render(key + "="))
 	m.textInputDialog.SetValue(value)
 	m.textInputDialog.Focus()
@@ -226,13 +221,12 @@ func (m *RequestPaneModel) handleNewHeader() {
 }
 
 func (m *RequestPaneModel) handleDeleteHeader() tea.Cmd {
-	item, ok := m.list.SelectedItem().(kvItem)
-	if !ok {
+	cursor, _, _, err := getKeyValueFromTableCursor(&m.table)
+	if err != nil {
 		return nil
 	}
-	key, value := item.key, item.value
 	return messages.UpdateRequestCmd(func(r *internal.Request) {
-		r.RemoveHeader(key, value)
+		r.RemoveHeaderI(cursor)
 	})
 }
 
@@ -353,6 +347,14 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	m.table, cmd = m.table.Update(msg)
 	cmds = append(cmds, cmd)
 	return m, tea.Batch(cmds...)
+}
+
+func (m *RequestPaneModel) Blur() {
+	m.table.SetStyles(tableBlurStyles())
+}
+
+func (m *RequestPaneModel) Focus() {
+	m.table.SetStyles(tableStyles())
 }
 
 func (m RequestPaneModel) renderTableWithoutHeader() string {

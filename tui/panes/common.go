@@ -1,6 +1,7 @@
 package panes
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -69,4 +70,22 @@ func makeKeyValueColumns(width int) []table.Column {
 		{Title: "Key", Width: keyWidth},
 		{Title: "Value", Width: width - keyWidth},
 	}
+}
+
+func getKeyValueFromTableCursor(table *table.Model) (
+	cursor int, key string, value string, err error,
+) {
+	cursor = table.Cursor()
+	if cursor < 0 || cursor >= len(table.Rows()) {
+		err = errors.New("cursor out of bounds")
+		return
+	}
+	row := table.Rows()[cursor]
+	if len(row) != 2 {
+		err = errors.New("invalid row")
+		return
+	}
+	key = row[0]
+	value = row[1]
+	return
 }

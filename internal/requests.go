@@ -128,8 +128,16 @@ func (r Request) String() string {
 	)
 }
 
+func (r *Request) RemoveParamI(index int) {
+	r.Params = r.Params[:index+copy(r.Params[index:], r.Params[index+1:])]
+}
+
 func (r *Request) RemoveParam(key, value string) {
 	r.Params = r.Params.Remove(key, value)
+}
+
+func (r *Request) RemoveHeaderI(index int) {
+	r.Headers = r.Headers[:index+copy(r.Headers[index:], r.Headers[index+1:])]
 }
 
 func (r *Request) RemoveHeader(key, value string) {
