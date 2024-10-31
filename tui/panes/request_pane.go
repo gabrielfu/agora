@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -76,6 +77,7 @@ type RequestPaneModel struct {
 	textAreaDialog        dialogs.TextAreaDialog
 	viewport              viewport.Model
 	list                  list.Model
+	table                 table.Model
 }
 
 func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext) RequestPaneModel {
@@ -85,6 +87,14 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 	l.SetFilteringEnabled(false)
 	l.SetShowHelp(false)
 	l.SetShowFilter(false)
+	t := table.New(
+		table.WithColumns(makeKeyValueColumns(0)),
+		table.WithRows(make([]table.Row, 0)),
+		table.WithFocused(true),
+		table.WithStyles(tableStyles()),
+	)
+	t.KeyMap.HalfPageUp.SetEnabled(false)
+	t.KeyMap.HalfPageDown.SetEnabled(false)
 	return RequestPaneModel{
 		rctx: rctx,
 		dctx: dctx,
@@ -114,16 +124,20 @@ func NewRequestPaneModel(rctx *states.RequestContext, dctx *states.DialogContext
 			views.RequestPaneView,
 		),
 		list:     l,
+		table:    t,
 		viewport: viewport.New(0, 0),
 	}
 }
 
 func (m *RequestPaneModel) SetWidth(width int) {
 	m.width = width
+	m.table.SetWidth(width)
+	m.table.SetColumns(makeKeyValueColumns(width))
 }
 
 func (m *RequestPaneModel) SetHeight(height int) {
 	m.height = height
+	m.table.SetHeight(height - 2)
 }
 
 func (m *RequestPaneModel) SetBorderColor(color string) {
@@ -243,28 +257,35 @@ func (m *RequestPaneModel) handleDeleteBody() tea.Cmd {
 // Refresh refreshes the list items based on the current tab.
 func (m *RequestPaneModel) Refresh() {
 	items := make([]list.Item, 0)
+	rows := make([]table.Row, 0)
 	if m.rctx.Empty() {
 		m.viewport.SetContent("")
 		m.list.SetItems(items)
+		m.table.SetRows(rows)
 		return
 	}
 	switch m.tab {
 	case requestParamsTab:
 		for _, kv := range m.rctx.Request().Params {
 			items = append(items, kvItem{key: kv.Key, value: kv.Value})
+			rows = append(rows, table.Row{kv.Key, kv.Value})
 		}
 		m.list.SetItems(items)
+		m.table.SetRows(rows)
 	case requestHeadersTab:
 		for _, kv := range m.rctx.Request().Headers {
 			items = append(items, kvItem{key: kv.Key, value: kv.Value})
+			rows = append(rows, table.Row{kv.Key, kv.Value})
 		}
 		m.list.SetItems(items)
+		m.table.SetRows(rows)
 	case requestBodyTab:
 		body := string(m.rctx.Request().Body)
 		body = styles.ColorizeJsonIfValid(body)
 		m.viewport.SetContent(body)
 	default:
 		m.list.SetItems(items)
+		m.table.SetRows(rows)
 	}
 }
 
@@ -327,9 +348,17 @@ func (m RequestPaneModel) Update(msg tea.Msg) (RequestPaneModel, tea.Cmd) {
 	}
 	m.viewport, cmd = m.viewport.Update(msg)
 	cmds = append(cmds, cmd)
-	m.list, cmd = m.list.Update(msg)
+	// m.list, cmd = m.list.Update(msg)
+	// cmds = append(cmds, cmd)
+	m.table, cmd = m.table.Update(msg)
 	cmds = append(cmds, cmd)
 	return m, tea.Batch(cmds...)
+}
+
+func (m RequestPaneModel) renderTableWithoutHeader() string {
+	t := m.table.View()
+	ts := strings.SplitN(t, "\n", 2)
+	return ts[len(ts)-1]
 }
 
 func (m RequestPaneModel) View() string {
@@ -338,7 +367,7 @@ func (m RequestPaneModel) View() string {
 	if !m.rctx.Empty() {
 		switch m.tab {
 		case requestParamsTab, requestHeadersTab:
-			text += m.list.View()
+			text += m.renderTableWithoutHeader()
 		case requestBodyTab:
 			text += m.viewport.View()
 		}

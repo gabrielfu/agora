@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gabrielfu/agora/tui/styles"
@@ -60,4 +61,12 @@ func (d simpleItemDelegate) Render(w io.Writer, m list.Model, index int, listIte
 		}
 	}
 	fmt.Fprint(w, fn(i.value))
+}
+
+func makeKeyValueColumns(width int) []table.Column {
+	keyWidth := int(float64(width) * 0.4)
+	return []table.Column{
+		{Title: "Key", Width: keyWidth},
+		{Title: "Value", Width: width - keyWidth},
+	}
 }

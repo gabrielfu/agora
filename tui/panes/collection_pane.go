@@ -52,7 +52,7 @@ type CollectionPaneModel struct {
 
 func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogContext, collection string) CollectionPaneModel {
 	t := table.New(
-		table.WithColumns(makeColumns(0)),
+		table.WithColumns(makeCollectionColumns(0)),
 		table.WithRows(make([]table.Row, 0)),
 		table.WithFocused(true),
 		table.WithStyles(tableStyles()),
@@ -85,7 +85,7 @@ func NewCollectionPaneModel(rctx *states.RequestContext, dctx *states.DialogCont
 	}
 }
 
-func makeColumns(width int) []table.Column {
+func makeCollectionColumns(width int) []table.Column {
 	return []table.Column{
 		{Title: "Method", Width: 6},
 		{Title: "URL", Width: max(0, width-6)},
@@ -95,7 +95,7 @@ func makeColumns(width int) []table.Column {
 func (m *CollectionPaneModel) SetWidth(width int) {
 	m.width = width
 	m.table.SetWidth(width)
-	m.table.SetColumns(makeColumns(width))
+	m.table.SetColumns(makeCollectionColumns(width))
 }
 
 func (m *CollectionPaneModel) SetHeight(height int) {
