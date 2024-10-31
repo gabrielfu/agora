@@ -136,12 +136,22 @@ func (r *Request) RemoveParam(key, value string) {
 	r.Params = r.Params.Remove(key, value)
 }
 
+func (r *Request) UpdateParam(index int, key, value string) {
+	r.Params[index].Key = key
+	r.Params[index].Value = value
+}
+
 func (r *Request) RemoveHeaderI(index int) {
 	r.Headers = r.Headers[:index+copy(r.Headers[index:], r.Headers[index+1:])]
 }
 
 func (r *Request) RemoveHeader(key, value string) {
 	r.Headers = r.Headers.Remove(key, value)
+}
+
+func (r *Request) UpdateHeader(index int, key, value string) {
+	r.Headers[index].Key = key
+	r.Headers[index].Value = value
 }
 
 func makeJsonBodyReader(body []byte) (io.Reader, error) {

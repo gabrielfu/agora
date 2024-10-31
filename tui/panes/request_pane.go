@@ -26,10 +26,10 @@ const (
 	requestBodyTab
 )
 
-func updateParamCmdFunc(cursor int) dialogs.TextInputCmdFunc {
+func updateParamCmdFunc(cursor int, key string) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
-			r.Params[cursor].Value = value
+			r.UpdateParam(cursor, key, value)
 		})
 	}
 }
@@ -40,10 +40,10 @@ var newParamCmdFunc dialogs.DoubleTextInputCmdFunc = func(key, value string) tea
 	})
 }
 
-func updateHeaderCmdFunc(cursor int) dialogs.TextInputCmdFunc {
+func updateHeaderCmdFunc(cursor int, key string) dialogs.TextInputCmdFunc {
 	return func(value string) tea.Cmd {
 		return messages.UpdateRequestCmd(func(r *internal.Request) {
-			r.Headers[cursor].Value = value
+			r.UpdateHeader(cursor, key, value)
 		})
 	}
 }
@@ -170,7 +170,7 @@ func (m *RequestPaneModel) handleUpdateParam() {
 	if err != nil {
 		return
 	}
-	m.textInputDialog.SetCmdFunc(updateParamCmdFunc(cursor))
+	m.textInputDialog.SetCmdFunc(updateParamCmdFunc(cursor, key))
 	m.textInputDialog.SetPrompt(focusedStyle.Render(key + "="))
 	m.textInputDialog.SetValue(value)
 	m.textInputDialog.Focus()
@@ -198,7 +198,7 @@ func (m *RequestPaneModel) handleUpdateHeader() {
 	if err != nil {
 		return
 	}
-	m.textInputDialog.SetCmdFunc(updateHeaderCmdFunc(cursor))
+	m.textInputDialog.SetCmdFunc(updateHeaderCmdFunc(cursor, key))
 	m.textInputDialog.SetPrompt(focusedStyle.Render(key + "="))
 	m.textInputDialog.SetValue(value)
 	m.textInputDialog.Focus()
