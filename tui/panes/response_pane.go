@@ -56,7 +56,7 @@ func NewResponsePaneModel(rctx *states.RequestContext) ResponsePaneModel {
 	t.KeyMap.HalfPageDown.SetEnabled(false)
 	return ResponsePaneModel{
 		rctx:     rctx,
-		tab:      responseBodyTab,
+		tab:      responseHeadersTab,
 		table:    t,
 		viewport: viewport.New(0, 0),
 	}
