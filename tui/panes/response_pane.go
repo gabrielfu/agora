@@ -71,8 +71,8 @@ func (m *ResponsePaneModel) SetWidth(width int) {
 
 func (m *ResponsePaneModel) SetHeight(height int) {
 	m.height = height
-	m.table.SetHeight(height - 4)
-	m.viewport.Height = height - 4
+	m.table.SetHeight(height - 2)
+	m.viewport.Height = height - 3
 }
 
 func (m *ResponsePaneModel) SetBorderColor(color string) {
