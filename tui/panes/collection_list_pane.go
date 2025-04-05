@@ -114,12 +114,25 @@ func (m *CollectionListPaneModel) Focus() {
 	m.refreshItemDelegate()
 }
 
+func (m *CollectionListPaneModel) Collections() []string {
+	var collections []string
+	for _, item := range m.list.Items() {
+		if simpleItem, ok := item.(simpleItem); ok {
+			collections = append(collections, simpleItem.value)
+		}
+	}
+	return collections
+}
+
 func (m *CollectionListPaneModel) SetCollections(collections []string) {
 	var items []list.Item
 	for _, collection := range collections {
 		items = append(items, simpleItem{value: collection})
 	}
 	m.list.SetItems(items)
+	if m.list.Index() >= len(items) {
+		m.list.Select(len(items) - 1)
+	}
 	m.Update(nil)
 }
 

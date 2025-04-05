@@ -111,6 +111,9 @@ func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 		rows = append(rows, table.Row{method, display})
 	}
 	m.table.SetRows(rows)
+	if m.table.Cursor() >= len(rows) {
+		m.table.SetCursor(len(rows) - 1)
+	}
 	m.Update(nil)
 }
 
