@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"sort"
 
 	"github.com/gabrielfu/agora/tui/styles"
@@ -16,7 +17,17 @@ type KVPair struct {
 	Value string `json:"v" yaml:"value"`
 }
 
+func (kv KVPair) Equal(other KVPair) bool {
+	return kv.Key == other.Key && kv.Value == other.Value
+}
+
 type KVPairs []KVPair
+
+func (kvs KVPairs) Equal(other KVPairs) bool {
+	return slices.EqualFunc(kvs, other, func(a, b KVPair) bool {
+		return a.Equal(b)
+	})
+}
 
 func (kvs KVPairs) Sort() {
 	sort.Slice(kvs, func(i, j int) bool {
@@ -83,6 +94,21 @@ func (r Request) CopyWithNewID() Request {
 	newReq := r.Copy()
 	newReq.ID = RandomID()
 	return newReq
+}
+
+func (r Request) Equal(other Request) bool {
+	return r.ID == other.ID &&
+		r.Name == other.Name &&
+		r.Method == other.Method &&
+		r.URL == other.URL &&
+		bytes.Equal(r.Body, other.Body) &&
+		r.Params.Equal(other.Params) &&
+		r.Headers.Equal(other.Headers) &&
+		r.Auth == other.Auth
+}
+
+func RequestEqual(a, b Request) bool {
+	return a.Equal(b)
 }
 
 func (r *Request) WithName(name string) *Request {
