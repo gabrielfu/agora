@@ -133,9 +133,19 @@ func (r *RequestFileStore) GetRequest(id string) (Request, error) {
 }
 
 func (r *RequestFileStore) listRequestsUnordered() ([]Request, error) {
-	entries, err := os.ReadDir(r.root)
+	rawEntries, err := os.ReadDir(r.root)
 	if err != nil {
 		return nil, err
+	}
+	var entries []os.DirEntry
+	for _, e := range rawEntries {
+		if e.IsDir() {
+			continue
+		}
+		if e.Name() == ".catalog" {
+			continue
+		}
+		entries = append(entries, e)
 	}
 
 	var wg sync.WaitGroup
