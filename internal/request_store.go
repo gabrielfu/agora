@@ -44,7 +44,7 @@ func (r *RequestFileStore) CreateRequest(req Request) error {
 		return err
 	}
 	filename := r.calcFilename(req.ID)
-	return os.WriteFile(filename, data, 0755)
+	return os.WriteFile(filename, data, 0644)
 }
 
 func (r *RequestFileStore) GetRequest(id string) (Request, error) {
