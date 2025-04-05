@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -292,14 +291,10 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if err != nil {
 		return m, tea.Quit
 	}
-	if !slices.Equal(collections, m.collectionListPane.Collections()) {
-		m.collectionListPane.SetCollections(collections)
-	}
-	if !slices.EqualFunc(reqs, m.collectionPane.Requests(), internal.RequestEqual) {
-		m.collectionPane.SetRequests(reqs)
-		m.requestPane.Refresh()
-		m.responsePane.Refresh()
-	}
+	m.collectionListPane.SetCollections(collections)
+	m.collectionPane.SetRequests(reqs)
+	m.requestPane.Refresh()
+	m.responsePane.Refresh()
 	m.updateDialogFocus()
 
 	return m, tea.Batch(cmds...)

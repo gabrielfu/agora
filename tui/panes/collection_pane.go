@@ -90,10 +90,6 @@ func (m *CollectionPaneModel) SetCollection(collection string) {
 	m.collection = collection
 }
 
-func (m *CollectionPaneModel) Requests() []internal.Request {
-	return m.requests
-}
-
 func (m *CollectionPaneModel) SetRequests(requests []internal.Request) {
 	m.requests = requests
 	var rows []table.Row
